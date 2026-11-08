@@ -906,6 +906,87 @@ declaration is a compile error rather than a model that is wrong on inputs
 nobody tried. The escape hatch is narrow and checked, which is the only reason
 it is acceptable.
 
+### 2026-11-08 — the cross-check bound is relative to the activation scale
+
+**Was:** §1.7 set the pass condition at `max_abs < 1e-4` in float32.
+
+**Why that was wrong:** it is the wrong unit. GPT-2 small's residual stream
+reaches an RMS of 41 and individual entries above 3000 by the last layer, so
+an absolute bound of 1e-4 there is a *relative* bound of 2e-6 — sixteen times
+float32 epsilon, which twelve layers of accumulation cannot possibly achieve.
+The original bound failed on a forward pass that is in fact correct. Measured:
+the deviation against the reference on real GPT-2 is 4.9e-4 absolute, which is
+1.19e-5 relative to the RMS, almost exactly 100x epsilon — the expected
+signature of accumulation, rising smoothly with depth rather than jumping at
+one layer.
+
+**Now:** the bound is `rel_rms < 5e-5`, set from that measurement with a
+factor of four of headroom, and checked per site against that site's own RMS.
+Attention patterns and log-probabilities keep an absolute bound of 1e-4, since
+their natural scale is already O(1) and a relative bound would be slack. A
+real bug — a transposed weight, the wrong activation, a position off by one —
+gives an O(1) relative deviation and cannot pass this.
+
+Elementwise relative error is deliberately *not* reported. Most entries of a
+residual stream are near zero, dividing by them produces enormous ratios that
+mean nothing, and any summary over them is dominated by the smallest element
+in the tensor.
+
+### 2026-11-08 — folding is behaviour-preserving, not activation-preserving
+
+**Was:** §1.6 said the folds are exact and §1.7 said to run the comparison
+"with folding both off and on", which read as though the same comparison
+applies either way.
+
+**Why that was wrong:** only the model's *function* is unchanged. Two of the
+three folds visibly move the intermediates:
+
+* `center_writing_weights` shifts the residual stream by a multiple of the
+  all-ones vector, which the next LayerNorm removes. Measured at layer 6 of
+  GPT-2: 4.69 raw difference, 7.3e-4 once the mean is taken out.
+* `fold_layernorm` moves the final gain and bias into the unembedding, so
+  `ln_final.normalized` legitimately differs afterwards.
+* `center_unembed` shifts every logit at a position by the same constant.
+
+Comparing raw intermediates across a fold therefore compares two different
+tensors, and the first version of the cross-check failed for that reason on
+three of its four arms.
+
+**Now:** the folded arm compares only the quantities that are invariant — the
+log-softmax of the logits, the attention patterns, and the *mean-centred*
+residual stream — and `benchmarks/cross_check_reference.py` says so where it
+does it. This is not a weaker test of the same claim; it is the right test of
+a different one.
+
+### 2026-11-08 — exactness and conditioning get different precisions
+
+Testing "the folds are an algebraic identity" in float32 measures the identity
+and the arithmetic noise together, and the noise is not small: at full
+sequence length the folded GPT-2 comparison lands at 7.7e-5 relative, against
+2.3e-5 for the unfolded one. **Folding is algebraically exact and about 3.3x
+worse conditioned in float32**, because absorbing `gamma` into `W_Q` changes
+the order the products accumulate in. That is a real cost of folding and is
+worth knowing before every attribution number in the repository is computed on
+a folded model.
+
+So the folded arm now runs twice: in float32, reported but not bounded,
+because it measures conditioning; and in float64, bounded at 1e-10 relative,
+because that is where the identity itself can be seen. Measured there:
+6.4e-14 on real GPT-2, which is the precision floor. The folds are exact.
+
+### 2026-11-08 — `sites.resolve` takes the config
+
+§1.4 wrote `sites.resolve(pattern)`. It cannot be: expanding `blocks.*` needs
+to know how many layers there are. The signature is
+`resolve(patterns, cfg, *, include_expensive=False)`.
+
+`include_expensive` is the other half of that change. `attn.result` is
+`n_heads` times the size of `attn.out`, so a wildcard reaching for
+`blocks.*.attn.*` would quietly allocate 1.8 GB on GPT-2 small at batch 8 and
+512 positions. Expensive sites are therefore excluded from wildcard expansion
+and included when named explicitly — you can still capture them, you cannot
+capture them by accident while reaching for something else.
+
 ### 2026-11-08 — `ModelConfig` details settled during phase 0
 
 Three small things the specification left implicit, resolved in code and

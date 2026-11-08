@@ -159,3 +159,11 @@ def test_repr_reports_usage_and_budget():
 def test_shuffle_buffer_names_its_phase():
     with pytest.raises(NotImplementedError, match="phase 6"):
         ShuffleBuffer()
+
+
+def test_human_readable_sizes_scale_to_tebibytes():
+    """Exercises the top of the unit ladder, which a realistic budget never reaches."""
+    store = ActivationStore(budget_bytes=1)
+    with pytest.raises(ActivationBudgetExceeded) as excinfo:
+        store.check_plan({"vast": ((1 << 41,), torch.float32)})
+    assert "TiB" in str(excinfo.value)

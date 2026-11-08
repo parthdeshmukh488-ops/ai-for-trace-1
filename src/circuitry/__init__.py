@@ -14,16 +14,14 @@ does not name its phase.
 
 from __future__ import annotations
 
-from .model import ACT_FNS, ModelConfig
+from .model import ACT_FNS, ModelConfig, sites
+from .model.hooks import capture, intervene
+from .model.loading import load_gpt2
+from .model.transformer import Transformer
 
 # Name -> the phase of docs/BUILD_PLAN.md that implements it.  Entries are
 # deleted from here as each phase lands, and the real object is imported above.
 _PENDING: dict[str, int] = {
-    "Transformer": 1,
-    "sites": 1,
-    "intervene": 1,
-    "capture": 1,
-    "load_gpt2": 1,
     "compile_program": 2,
     "patch": 3,
     "path_patch": 3,

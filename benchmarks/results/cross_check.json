@@ -1,0 +1,1021 @@
+{
+  "export": {
+    "config": {
+      "batch": 4,
+      "d_mlp": 256,
+      "d_model": 64,
+      "d_vocab": 128,
+      "n_heads": 4,
+      "n_layers": 6,
+      "seq": 32
+    },
+    "folded_f32": {
+      "abs_bound": Infinity,
+      "bounded": false,
+      "dtype": "float32",
+      "grows_with_depth": false,
+      "max_abs": 1.1444091796875e-05,
+      "max_rel_rms": 1.0779006189330588e-05,
+      "mode": "fold-invariant",
+      "n_sites_compared": 13,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.384185791015625e-07,
+          "rel_rms": 3.0463179424468264e-06,
+          "rms": 0.07826450935389326,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 7.450580596923828e-09,
+          "rel_rms": 2.65446726504155e-07,
+          "rms": 0.028068082417310222,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.662441253662109e-07,
+          "rel_rms": 7.849203109318918e-06,
+          "rms": 0.07214033290767327,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 3.814697265625e-06,
+          "rel_rms": 3.3661588149980957e-06,
+          "rms": 1.1332493430281476,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.172325134277344e-07,
+          "rel_rms": 6.132575336326446e-06,
+          "rms": 0.06803544849359588,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.76837158203125e-06,
+          "rel_rms": 2.3973816498858096e-06,
+          "rms": 1.9889914408322822,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.5762786865234375e-07,
+          "rel_rms": 5.32608987023641e-06,
+          "rms": 0.06714642023801781,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 7.152557373046875e-06,
+          "rel_rms": 2.8066964113328983e-06,
+          "rms": 2.5483901088005916,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 7.152557373046875e-07,
+          "rel_rms": 1.0779006189330588e-05,
+          "rms": 0.06635637133344176,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 7.62939453125e-06,
+          "rel_rms": 2.3423268057214583e-06,
+          "rms": 3.2571861930684247,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.5762786865234375e-07,
+          "rel_rms": 5.483021612737638e-06,
+          "rms": 0.06522459583626963,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.1444091796875e-05,
+          "rel_rms": 3.013181034732343e-06,
+          "rms": 3.7980100315783267,
+          "within_bound": true
+        },
+        "log_softmax(logits)": {
+          "bound": "absolute",
+          "max_abs": 9.5367431640625e-07,
+          "rel_rms": 1.9593043209049606e-07,
+          "rms": 4.867412919121049,
+          "within_bound": true
+        }
+      },
+      "rel_bound": Infinity,
+      "resid_rel_rms_by_depth": [
+        2.65446726504155e-07,
+        3.3661588149980957e-06,
+        2.3973816498858096e-06,
+        2.8066964113328983e-06,
+        2.3423268057214583e-06,
+        3.013181034732343e-06
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.4.attn.pattern"
+    },
+    "folded_f64": {
+      "abs_bound": 1e-10,
+      "bounded": true,
+      "dtype": "float64",
+      "grows_with_depth": false,
+      "max_abs": 1.176836406102666e-14,
+      "max_rel_rms": 1.3850791728967881e-14,
+      "mode": "fold-invariant",
+      "n_sites_compared": 13,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.440892098500626e-16,
+          "rel_rms": 5.674209322896703e-15,
+          "rms": 0.07826450956930041,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0,
+          "rel_rms": 0.0,
+          "rms": 0.028068082417600497,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 9.992007221626409e-16,
+          "rel_rms": 1.3850791728967881e-14,
+          "rms": 0.07214033260444515,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 3.885780586188048e-15,
+          "rel_rms": 3.428884024696305e-15,
+          "rms": 1.1332493482430366,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 7.771561172376096e-16,
+          "rel_rms": 1.1422811717835724e-14,
+          "rms": 0.0680354484022658,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 6.661338147750939e-15,
+          "rel_rms": 3.3491034220097653e-15,
+          "rms": 1.9889914727546794,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 7.771561172376096e-16,
+          "rel_rms": 1.1574051488186017e-14,
+          "rms": 0.06714641956024442,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 8.881784197001252e-15,
+          "rel_rms": 3.485252908323838e-15,
+          "rms": 2.5483901543526053,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 8.326672684688674e-16,
+          "rel_rms": 1.2548414949179183e-14,
+          "rms": 0.0663563702540243,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.0658141036401503e-14,
+          "rel_rms": 3.2721927356379565e-15,
+          "rms": 3.2571862043216595,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.551115123125783e-16,
+          "rel_rms": 8.510769737766815e-15,
+          "rms": 0.06522459535584109,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.176836406102666e-14,
+          "rel_rms": 3.0985605507771174e-15,
+          "rms": 3.798010033425088,
+          "within_bound": true
+        },
+        "log_softmax(logits)": {
+          "bound": "absolute",
+          "max_abs": 1.7763568394002505e-15,
+          "rel_rms": 3.6494886997098047e-16,
+          "rms": 4.867412905105037,
+          "within_bound": true
+        }
+      },
+      "rel_bound": 1e-10,
+      "resid_rel_rms_by_depth": [
+        0.0,
+        3.428884024696305e-15,
+        3.3491034220097653e-15,
+        3.485252908323838e-15,
+        3.2721927356379565e-15,
+        3.0985605507771174e-15
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.1.attn.pattern"
+    },
+    "unfolded": {
+      "abs_bound": 0.0001,
+      "dtype": "float32",
+      "grows_with_depth": false,
+      "max_abs": 5.781650543212891e-06,
+      "max_rel_rms": 5.1265099717513765e-06,
+      "mode": "exact",
+      "n_sites_compared": 15,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.682209014892578e-07,
+          "rel_rms": 3.3619596113731306e-06,
+          "rms": 0.07978111949408813,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0,
+          "rel_rms": 0.0,
+          "rms": 0.028033940303081605,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.5762786865234375e-07,
+          "rel_rms": 5.1265099717513765e-06,
+          "rms": 0.06976049410280712,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.6689300537109375e-06,
+          "rel_rms": 1.458966272264535e-06,
+          "rms": 1.1439127041096757,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.2782554626464844e-07,
+          "rel_rms": 4.843376346364025e-06,
+          "rms": 0.06768533411836779,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 2.86102294921875e-06,
+          "rel_rms": 1.3107058134770318e-06,
+          "rms": 2.182810909817396,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.384185791015625e-07,
+          "rel_rms": 3.6015607139253853e-06,
+          "rms": 0.06619868385939472,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 3.337860107421875e-06,
+          "rel_rms": 1.198495141967356e-06,
+          "rms": 2.7850426677096953,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.980232238769531e-07,
+          "rel_rms": 4.5457162574403965e-06,
+          "rms": 0.06556133445178211,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 5.4836273193359375e-06,
+          "rel_rms": 1.5165714533476612e-06,
+          "rms": 3.61580544538897,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.682209014892578e-07,
+          "rel_rms": 4.128139673843304e-06,
+          "rms": 0.06497379514282368,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 5.781650543212891e-06,
+          "rel_rms": 1.389503137629895e-06,
+          "rms": 4.16094817394567,
+          "within_bound": true
+        },
+        "embed+pos_embed": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0,
+          "rel_rms": 0.0,
+          "rms": 0.028033940303081605,
+          "within_bound": true
+        },
+        "ln_final.normalized": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.4901161193847656e-06,
+          "rel_rms": 1.4901164802463652e-06,
+          "rms": 0.9999997578299386,
+          "within_bound": true
+        },
+        "logits": {
+          "bound": "relative_to_rms",
+          "max_abs": 2.682209014892578e-07,
+          "rel_rms": 1.677063391304577e-06,
+          "rms": 0.15993486166352391,
+          "within_bound": true
+        }
+      },
+      "rel_bound": 5e-05,
+      "resid_rel_rms_by_depth": [
+        0.0,
+        1.458966272264535e-06,
+        1.3107058134770318e-06,
+        1.198495141967356e-06,
+        1.5165714533476612e-06,
+        1.389503137629895e-06
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.1.attn.pattern"
+    }
+  },
+  "import": {
+    "checkpoint": {
+      "d_model": 768,
+      "n_layers": 12,
+      "name": "gpt2"
+    },
+    "folded_f32": {
+      "abs_bound": Infinity,
+      "bounded": false,
+      "dtype": "float32",
+      "grows_with_depth": true,
+      "max_abs": 0.00146484375,
+      "max_rel_rms": 7.675697027796992e-05,
+      "mode": "fold-invariant",
+      "n_sites_compared": 25,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.043081283569336e-06,
+          "rel_rms": 7.664336254677051e-06,
+          "rms": 0.1360954489611296,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.76837158203125e-07,
+          "rel_rms": 2.23247385261281e-06,
+          "rms": 0.21359137427076755,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.2516975402832031e-06,
+          "rel_rms": 1.0723209510410139e-05,
+          "rms": 0.11672788254934773,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 6.103515625e-05,
+          "rel_rms": 2.6082954325576885e-05,
+          "rms": 2.34003999271467,
+          "within_bound": true
+        },
+        "blocks.10.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.9669532775878906e-06,
+          "rel_rms": 1.1932978858885053e-05,
+          "rms": 0.16483338325227462,
+          "within_bound": true
+        },
+        "blocks.10.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.16022637503226e-05,
+          "rms": 23.473782721557487,
+          "within_bound": true
+        },
+        "blocks.11.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.996755599975586e-06,
+          "rel_rms": 1.3490574367221442e-05,
+          "rms": 0.14801116287733296,
+          "within_bound": true
+        },
+        "blocks.11.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.0407621039056316e-05,
+          "rms": 24.167780109007047,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.9802322387695312e-06,
+          "rel_rms": 2.45924548004568e-05,
+          "rms": 0.12118482123688498,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 6.103515625e-05,
+          "rel_rms": 1.1907737337630208e-05,
+          "rms": 5.125672033184666,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 6.0498714447021484e-06,
+          "rel_rms": 4.300013289299735e-05,
+          "rms": 0.14069424994003638,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00146484375,
+          "rel_rms": 7.675697027796992e-05,
+          "rms": 19.084178866038776,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.410743713378906e-06,
+          "rel_rms": 2.7596020847959584e-05,
+          "rms": 0.15983259824595442,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.7896273276240365e-05,
+          "rms": 20.38911241314547,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.8014183044433594e-06,
+          "rel_rms": 1.6974446943787034e-05,
+          "rms": 0.16503738317487457,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.000732421875,
+          "rel_rms": 3.409111345854088e-05,
+          "rms": 21.484246206587475,
+          "within_bound": true
+        },
+        "blocks.6.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.933906555175781e-06,
+          "rel_rms": 2.4891195105764602e-05,
+          "rms": 0.1580441010751115,
+          "within_bound": true
+        },
+        "blocks.6.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.000732421875,
+          "rel_rms": 3.3017055258040594e-05,
+          "rms": 22.183137450503988,
+          "within_bound": true
+        },
+        "blocks.7.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.947185516357422e-06,
+          "rel_rms": 2.8893392250501502e-05,
+          "rms": 0.17122203836316774,
+          "within_bound": true
+        },
+        "blocks.7.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.3157760828413536e-05,
+          "rms": 22.627737891282486,
+          "within_bound": true
+        },
+        "blocks.8.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.2186508178710938e-06,
+          "rel_rms": 1.98391823492074e-05,
+          "rms": 0.1622370701179468,
+          "within_bound": true
+        },
+        "blocks.8.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.256380721278137e-05,
+          "rms": 22.943495047753874,
+          "within_bound": true
+        },
+        "blocks.9.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.682209014892578e-06,
+          "rel_rms": 1.550790062674934e-05,
+          "rms": 0.17295758332795075,
+          "within_bound": true
+        },
+        "blocks.9.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0009765625,
+          "rel_rms": 4.2103204126166145e-05,
+          "rms": 23.194493632210037,
+          "within_bound": true
+        },
+        "log_softmax(logits)": {
+          "bound": "absolute",
+          "max_abs": 0.00016117095947265625,
+          "rel_rms": 1.1677522033390999e-05,
+          "rms": 13.801811635362363,
+          "within_bound": true
+        }
+      },
+      "rel_bound": Infinity,
+      "resid_rel_rms_by_depth": [
+        2.23247385261281e-06,
+        2.6082954325576885e-05,
+        1.1907737337630208e-05,
+        7.675697027796992e-05,
+        4.7896273276240365e-05,
+        3.409111345854088e-05,
+        3.3017055258040594e-05,
+        4.3157760828413536e-05,
+        4.256380721278137e-05,
+        4.2103204126166145e-05,
+        4.16022637503226e-05,
+        4.0407621039056316e-05
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.3.resid_pre (centred)"
+    },
+    "folded_f64": {
+      "abs_bound": 1e-10,
+      "bounded": true,
+      "dtype": "float64",
+      "grows_with_depth": true,
+      "max_abs": 9.094947017729282e-13,
+      "max_rel_rms": 6.391736614842751e-14,
+      "mode": "fold-invariant",
+      "n_sites_compared": 25,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.27675647831893e-15,
+          "rel_rms": 9.38133120776803e-15,
+          "rms": 0.13609544850753552,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 8.881784197001252e-16,
+          "rel_rms": 4.158306584709204e-15,
+          "rms": 0.21359137466345252,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.887379141862766e-15,
+          "rel_rms": 1.6169051405320497e-14,
+          "rms": 0.11672788307431045,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.973799150320701e-14,
+          "rel_rms": 2.125518926084462e-14,
+          "rms": 2.3400399259126883,
+          "within_bound": true
+        },
+        "blocks.10.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 6.661338147750939e-15,
+          "rel_rms": 4.041255715054622e-14,
+          "rms": 0.16483337401629644,
+          "within_bound": true
+        },
+        "blocks.10.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.094947017729282e-13,
+          "rel_rms": 3.8745128636066025e-14,
+          "rms": 23.473781964071794,
+          "within_bound": true
+        },
+        "blocks.11.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.9976021664879227e-15,
+          "rel_rms": 2.0252541770903543e-14,
+          "rms": 0.14801115832258266,
+          "within_bound": true
+        },
+        "blocks.11.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.094947017729282e-13,
+          "rel_rms": 3.763253082129209e-14,
+          "rms": 24.167779363335978,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 6.106226635438361e-15,
+          "rel_rms": 5.038771704047303e-14,
+          "rms": 0.1211848242803627,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 1.4210854715202004e-13,
+          "rel_rms": 2.7724861892724108e-14,
+          "rms": 5.125671958326828,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 8.992806499463768e-15,
+          "rel_rms": 6.391736614842751e-14,
+          "rms": 0.14069425950031902,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.094947017729282e-13,
+          "rel_rms": 4.765699648369416e-14,
+          "rms": 19.084180054949787,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.995204332975845e-15,
+          "rel_rms": 3.7509271976759875e-14,
+          "rms": 0.15983259650281603,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.547473508864641e-13,
+          "rel_rms": 2.2303440203467065e-14,
+          "rms": 20.389112474934414,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.773159728050814e-15,
+          "rel_rms": 3.498092263772447e-14,
+          "rms": 0.16503737731105086,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.094947017729282e-13,
+          "rel_rms": 4.2333098527931654e-14,
+          "rms": 21.484245977714995,
+          "within_bound": true
+        },
+        "blocks.6.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.773159728050814e-15,
+          "rel_rms": 3.652879044090349e-14,
+          "rms": 0.15804409777516912,
+          "within_bound": true
+        },
+        "blocks.6.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.547473508864641e-13,
+          "rel_rms": 2.0499686096301963e-14,
+          "rms": 22.183137280745882,
+          "within_bound": true
+        },
+        "blocks.7.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 6.5503158452884236e-15,
+          "rel_rms": 3.825626786011586e-14,
+          "rms": 0.17122203005373315,
+          "within_bound": true
+        },
+        "blocks.7.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.547473508864641e-13,
+          "rel_rms": 2.0096898716749316e-14,
+          "rms": 22.62773760746801,
+          "within_bound": true
+        },
+        "blocks.8.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 6.5503158452884236e-15,
+          "rel_rms": 4.0374963552744895e-14,
+          "rms": 0.16223707141509233,
+          "within_bound": true
+        },
+        "blocks.8.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 4.547473508864641e-13,
+          "rel_rms": 1.982031762437456e-14,
+          "rms": 22.943494625294328,
+          "within_bound": true
+        },
+        "blocks.9.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 5.551115123125783e-15,
+          "rel_rms": 3.2095240864438414e-14,
+          "rms": 0.17295757793413005,
+          "within_bound": true
+        },
+        "blocks.9.resid_pre (centred)": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.094947017729282e-13,
+          "rel_rms": 3.921166634970958e-14,
+          "rms": 23.19449251816008,
+          "within_bound": true
+        },
+        "log_softmax(logits)": {
+          "bound": "absolute",
+          "max_abs": 3.3928415632544784e-13,
+          "rel_rms": 2.458258017657e-14,
+          "rms": 13.801812254387531,
+          "within_bound": true
+        }
+      },
+      "rel_bound": 1e-10,
+      "resid_rel_rms_by_depth": [
+        4.158306584709204e-15,
+        2.125518926084462e-14,
+        2.7724861892724108e-14,
+        4.765699648369416e-14,
+        2.2303440203467065e-14,
+        4.2333098527931654e-14,
+        2.0499686096301963e-14,
+        2.0096898716749316e-14,
+        1.982031762437456e-14,
+        3.921166634970958e-14,
+        3.8745128636066025e-14,
+        3.763253082129209e-14
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.3.attn.pattern"
+    },
+    "unfolded": {
+      "abs_bound": 0.0001,
+      "dtype": "float32",
+      "grows_with_depth": true,
+      "max_abs": 0.00048828125,
+      "max_rel_rms": 2.3088741307077396e-05,
+      "mode": "exact",
+      "n_sites_compared": 27,
+      "offenders": [],
+      "per_site": {
+        "blocks.0.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.470348358154297e-07,
+          "rel_rms": 3.2847155377187367e-06,
+          "rms": 0.1360954489611296,
+          "within_bound": true
+        },
+        "blocks.0.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0,
+          "rel_rms": 0.0,
+          "rms": 0.21360120173325892,
+          "within_bound": true
+        },
+        "blocks.1.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 4.76837158203125e-07,
+          "rel_rms": 4.085032194441958e-06,
+          "rms": 0.11672788254934773,
+          "within_bound": true
+        },
+        "blocks.1.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 3.814697265625e-05,
+          "rel_rms": 1.6301288685387893e-05,
+          "rms": 2.340120059982993,
+          "within_bound": true
+        },
+        "blocks.10.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.4007091522216797e-06,
+          "rel_rms": 8.497727369206023e-06,
+          "rms": 0.16483338325227462,
+          "within_bound": true
+        },
+        "blocks.10.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00048828125,
+          "rel_rms": 2.0782916708302036e-05,
+          "rms": 23.49435629528116,
+          "within_bound": true
+        },
+        "blocks.11.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.043081283569336e-06,
+          "rel_rms": 7.0473149679515e-06,
+          "rms": 0.14801116287733296,
+          "within_bound": true
+        },
+        "blocks.11.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00048828125,
+          "rel_rms": 2.018653410571495e-05,
+          "rms": 24.188463826574576,
+          "within_bound": true
+        },
+        "blocks.2.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.5033950805664062e-06,
+          "rel_rms": 2.0657662032383713e-05,
+          "rms": 0.12118482123688498,
+          "within_bound": true
+        },
+        "blocks.2.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 6.103515625e-05,
+          "rel_rms": 1.1901563815015165e-05,
+          "rms": 5.128330797419854,
+          "within_bound": true
+        },
+        "blocks.3.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 3.248453140258789e-06,
+          "rel_rms": 2.3088741307077396e-05,
+          "rms": 0.14069424994003638,
+          "within_bound": true
+        },
+        "blocks.3.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.000244140625,
+          "rel_rms": 1.278139811529626e-05,
+          "rms": 19.101245638207793,
+          "within_bound": true
+        },
+        "blocks.4.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.682209014892578e-06,
+          "rel_rms": 1.678136402916461e-05,
+          "rms": 0.15983259824595442,
+          "within_bound": true
+        },
+        "blocks.4.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0001220703125,
+          "rel_rms": 5.981618454605544e-06,
+          "rms": 20.4075725368294,
+          "within_bound": true
+        },
+        "blocks.5.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.2649765014648438e-06,
+          "rel_rms": 1.3724020933274624e-05,
+          "rms": 0.16503738317487457,
+          "within_bound": true
+        },
+        "blocks.5.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.000244140625,
+          "rel_rms": 1.1353449948774682e-05,
+          "rms": 21.503650969663965,
+          "within_bound": true
+        },
+        "blocks.6.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.175569534301758e-06,
+          "rel_rms": 1.3765585172127393e-05,
+          "rms": 0.1580441010751115,
+          "within_bound": true
+        },
+        "blocks.6.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.000244140625,
+          "rel_rms": 1.0995830342996515e-05,
+          "rms": 22.203018542887804,
+          "within_bound": true
+        },
+        "blocks.7.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.384185791015625e-06,
+          "rel_rms": 1.3924526385783858e-05,
+          "rms": 0.17122203836316774,
+          "within_bound": true
+        },
+        "blocks.7.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00048828125,
+          "rel_rms": 2.1559664297419988e-05,
+          "rms": 22.647905981468917,
+          "within_bound": true
+        },
+        "blocks.8.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 2.1457672119140625e-06,
+          "rel_rms": 1.3226121566138268e-05,
+          "rms": 0.1622370701179468,
+          "within_bound": true
+        },
+        "blocks.8.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00048828125,
+          "rel_rms": 2.1263009114590033e-05,
+          "rms": 22.963882833731006,
+          "within_bound": true
+        },
+        "blocks.9.attn.pattern": {
+          "bound": "absolute",
+          "max_abs": 1.5497207641601562e-06,
+          "rel_rms": 8.960120362121839e-06,
+          "rms": 0.17295758332795075,
+          "within_bound": true
+        },
+        "blocks.9.resid_pre": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.00048828125,
+          "rel_rms": 2.103299148729334e-05,
+          "rms": 23.21501676520838,
+          "within_bound": true
+        },
+        "embed+pos_embed": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0,
+          "rel_rms": 0.0,
+          "rms": 0.21360120173325892,
+          "within_bound": true
+        },
+        "ln_final.normalized": {
+          "bound": "relative_to_rms",
+          "max_abs": 0.0001068115234375,
+          "rel_rms": 1.5522679182614207e-05,
+          "rms": 6.880997937336204,
+          "within_bound": true
+        },
+        "logits": {
+          "bound": "relative_to_rms",
+          "max_abs": 9.1552734375e-05,
+          "rel_rms": 1.1690208707955254e-06,
+          "rms": 78.31573983165745,
+          "within_bound": true
+        }
+      },
+      "rel_bound": 5e-05,
+      "resid_rel_rms_by_depth": [
+        0.0,
+        1.6301288685387893e-05,
+        1.1901563815015165e-05,
+        1.278139811529626e-05,
+        5.981618454605544e-06,
+        1.1353449948774682e-05,
+        1.0995830342996515e-05,
+        2.1559664297419988e-05,
+        2.1263009114590033e-05,
+        2.103299148729334e-05,
+        2.0782916708302036e-05,
+        2.018653410571495e-05
+      ],
+      "within_bounds": true,
+      "worst_site": "blocks.3.attn.pattern"
+    }
+  },
+  "metadata": {
+    "command": "python benchmarks/cross_check_reference.py",
+    "device": "cpu",
+    "dtype": "float32",
+    "git_sha": "6a9617d",
+    "scope": "full",
+    "seed": 0,
+    "tolerance_abs": 0.0001,
+    "tolerance_rel_rms": 5e-05,
+    "versions": {
+      "python": "3.13.18",
+      "torch": "2.15.0+cpu"
+    },
+    "wall_seconds": 6.6
+  }
+}

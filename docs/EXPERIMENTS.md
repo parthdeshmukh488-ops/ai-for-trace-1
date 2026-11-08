@@ -353,3 +353,29 @@ entry: what was expected, what was measured, and what was done about it.
 
 This section being empty at the end of phase 10 means the experiments were not
 sharp enough, not that everything worked.
+
+### Phase 1 — an absolute tolerance was the wrong unit, and folding costs precision
+
+*Expected:* the forward-pass cross-check would agree with the reference to
+better than 1e-4 absolute, as SPEC §1.7 specified, and folding would make no
+difference to that.
+
+*Measured:* neither. On real GPT-2 the deviation is 4.9e-4 absolute, which
+sounds like a failure and is not: the residual stream there has an RMS of 41
+and entries above 3000, so 4.9e-4 is 1.19e-5 *relative*, about 100x float32
+epsilon and exactly what twelve layers of accumulation produce. The bound was
+in the wrong unit. And folding, which is algebraically exact, is **3.3x worse
+conditioned in float32** — 7.7e-5 relative against 2.3e-5 unfolded — because
+absorbing the LayerNorm gain into `W_Q` changes the order the products
+accumulate in.
+
+*Done about it:* the bound is now relative to each site's own RMS, and the
+exactness claim is checked in float64 where it can actually be seen (6.4e-14
+on real GPT-2 — the identity holds). The float32 folded figure is reported
+rather than bounded, because it measures conditioning rather than correctness.
+
+*Why it matters downstream:* every attribution number in this repository is
+computed on a folded model, so the 3.3x is a floor under the precision of all
+of them. Phase 4 measures attribution errors in the 1e-2 range, so it is not
+binding there — but it is worth knowing, and it is the reason the compiled
+models in phase 2 are kept in float64.

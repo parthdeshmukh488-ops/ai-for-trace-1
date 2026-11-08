@@ -44,6 +44,7 @@ markers = [
   "slow: dictionary training and full-model sweeps",
   "oracle: requires transformers for the independent forward-pass cross-check",
   "gpu: requires CUDA; skipped on CPU-only runners",
+  "network: downloads weights or datasets; excluded from CI, since a test that fails when a download fails is not testing this code",
 ]
 
 [tool.ruff]

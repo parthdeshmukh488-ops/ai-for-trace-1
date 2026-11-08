@@ -37,7 +37,7 @@ jobs:
           pip install -e ".[dev]"
 
       - name: Run test suite
-        run: pytest tests/ -q -m "not slow and not gpu"
+        run: pytest tests/ -q -m "not slow and not gpu and not network"
 
   coverage:
     name: coverage, oracle cross-check and experiments
@@ -58,7 +58,7 @@ jobs:
       # enforced rather than merely reported.
       - name: Coverage
         run: >
-          pytest tests/ -q -m "not gpu" --cov=circuitry
+          pytest tests/ -q -m "not gpu and not network" --cov=circuitry
           --cov-report=term-missing --cov-fail-under=93
 
       # An independently written transformer is the strongest available oracle
@@ -70,10 +70,14 @@ jobs:
       # lands, so the build is green from the first commit and starts enforcing
       # every gate the moment there is something to enforce.  A check that is
       # skipped says so in the log rather than passing silently.
+      # --no-import keeps CI off the network: the export arm compares a random
+      # model against the reference implementation, which tests the forward
+      # pass without a download in the way.  The import arm, which checks the
+      # weight mapping against a real checkpoint, is run by hand.
       - name: Cross-check the forward pass against the reference implementation
         run: |
           if [ -f benchmarks/cross_check_reference.py ]; then
-            python benchmarks/cross_check_reference.py
+            python benchmarks/cross_check_reference.py --no-import
           else
             echo "skipped: benchmarks/cross_check_reference.py lands in phase 1"
           fi

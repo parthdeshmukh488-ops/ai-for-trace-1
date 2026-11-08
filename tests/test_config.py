@@ -60,3 +60,23 @@ def test_with_recomputes_d_head_when_head_count_changes():
 def test_with_revalidates():
     with pytest.raises(ValueError):
         ModelConfig(**TINY).with_(act_fn="nope")
+
+
+def test_non_positive_explicit_d_head_raises():
+    with pytest.raises(ValueError, match="d_head"):
+        ModelConfig(**TINY, d_head=0)
+
+
+def test_unknown_positional_scheme_raises():
+    with pytest.raises(ValueError, match="positional"):
+        ModelConfig(**TINY, positional="rotary")
+
+
+def test_unknown_dtype_raises():
+    with pytest.raises(ValueError, match="dtype"):
+        ModelConfig(**TINY, dtype="int8")
+
+
+def test_non_positive_ln_eps_raises():
+    with pytest.raises(ValueError, match="ln_eps"):
+        ModelConfig(**TINY, ln_eps=0.0)
