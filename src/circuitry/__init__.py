@@ -14,6 +14,7 @@ does not name its phase.
 
 from __future__ import annotations
 
+from .attrib import Circuit, patch, path_patch
 from .model import ACT_FNS, ModelConfig, sites
 from .model.hooks import capture, intervene
 from .model.loading import load_gpt2
@@ -23,9 +24,6 @@ from .symbolic import compile_program
 # Name -> the phase of docs/BUILD_PLAN.md that implements it.  Entries are
 # deleted from here as each phase lands, and the real object is imported above.
 _PENDING: dict[str, int] = {
-    "patch": 3,
-    "path_patch": 3,
-    "Circuit": 3,
     "attribute": 4,
     "discover": 5,
     "train_sae": 6,

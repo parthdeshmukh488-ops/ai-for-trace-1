@@ -988,6 +988,46 @@ custom predicate — takes the slot as the second four-deep composed program.
 The suite is nine programs, as specified, and `docs/EXPERIMENTS.md` reports
 per program.
 
+### 2026-11-08 — the level is not the effect
+
+**Was:** §3.1 defined the normalised metric as `(patched - corrupt) /
+(clean - corrupt)`, with 0 meaning corrupt and 1 meaning clean, and called it
+the effect.
+
+**Why that was wrong:** it is the *level*, and which level corresponds to "no
+patch applied" depends on the direction. Denoising starts from the corrupt
+prompt, so an unpatched run reads 0 and the level is the effect. Noising starts
+from the clean prompt, so an unpatched run reads **1**, and a patch that
+destroys nothing reads 0.95. Reporting that as an effect makes a component
+that does nothing look maximally important, and summing such numbers over a
+component's outgoing edges gives a total larger than the model — measured: a
+"sum of edges" of 3.72 against a node effect of 0.86.
+
+**Now:** `PatchResult` carries `levels` and `effects` separately, and
+`metric.effect_of(level, direction)` is the only way to get from one to the
+other. Denoising effects are positive and mean "restored this much"; noising
+effects are negative and mean "destroyed this much"; magnitudes are comparable
+across directions, which is what phase 4 needs in order to report both.
+
+### 2026-11-08 — `sites.resolve` and `patch` take the config and a granularity
+
+Two signature changes §3.3 did not anticipate.
+
+`patch` takes a **granularity** rather than an `index_subset`: a mapping from
+axis name to `"each"` or `"all"`, defaulting to iterating position and head
+and pooling query, key, neuron and vocabulary. Iterating an attention
+pattern's key axis is `T` times the measurements, which is occasionally what
+you want and never what you want by accident.
+
+`patch` also takes a **chunk size**, because the batched implementation is not
+an optional optimisation. Patching one index at a time costs one forward pass
+per index, and phases 4 and 5 enumerate every head at every position of every
+program. Replicating the prompt batch and patching a different index in each
+replica makes the measurements independent and exact — the model never mixes
+information across the batch dimension — and
+`tests/test_patching.py::test_batched_equals_unbatched` asserts that `chunk=1`
+and `chunk=32` agree to 1e-12.
+
 ### 2026-11-08 — the default logit scale is 40, and float32 does not overflow
 
 **Was:** §2.4 left the scale to be chosen from the fidelity sweep, and the

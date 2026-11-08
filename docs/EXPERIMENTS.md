@@ -386,6 +386,50 @@ entry: what was expected, what was measured, and what was done about it.
 This section being empty at the end of phase 10 means the experiments were not
 sharp enough, not that everything worked.
 
+### Phase 3 — edge effects do not sum to node effects, and the compiled regime cannot show it
+
+*Expected:* the build plan asked for one number — the discrepancy between the
+sum of a component's edge effects and its node effect — and expected it to be
+a modest remainder from the nonlinearities.
+
+*Measured:* it is not modest. On an untrained model, whose softmaxes and MLP
+activations are nowhere near saturated, one head with four outgoing edges
+gives:
+
+| direction | node effect | sum of edges | discrepancy |
+|---|---|---|---|
+| denoise | −0.139 | +0.241 | +0.380, i.e. **273%** of the node effect |
+| noise | −0.142 | −0.277 | −0.135, i.e. **95%** of the node effect |
+
+The denoising row is the striking one: patching the head alone *hurts*, while
+patching any single path from it *helps*. A decomposition into edges is not a
+small perturbation of the node measurement — on this model the two disagree
+about the sign.
+
+*And the part that matters for the whole project:* **on a compiled model the
+discrepancy is exactly 0.** It would be a serious error to report that as
+evidence that edge decomposition is sound. Compiled lookup tables are
+piecewise constant, so a patch either flips a switch or does nothing, and
+every nonlinear interaction vanishes by construction. The compiled regime
+therefore *cannot exhibit* this phenomenon, and any claim about edge
+decomposition measured there carries no information about trained models.
+
+*Done about it:* the number is reported in both regimes, with the caveat
+stated wherever it appears; `tests/test_paths.py` contains both measurements
+and the docstring of the compiled one says in those words that it is a caveat
+on the regime rather than a result about decomposition. Phase 5's
+planted-algorithm arm — trained models, unsaturated — is where the honest
+version of this measurement lives.
+
+*A second finding, from the same work:* the level/effect distinction. The
+normalised metric runs 0-is-corrupt to 1-is-clean in both directions, so the
+*unpatched* run reads 0 when denoising and **1** when noising. Reporting the
+level as the effect therefore makes a noising patch that destroys nothing look
+maximally important, and summing such numbers over a component's edges gives
+an answer larger than the whole model — which is exactly what the first
+version of this measurement did, giving a "sum of edges" of 3.72 against a
+node effect of 0.86. `effect_of` now exists solely to make that mistake hard.
+
 ### Phase 1 — an absolute tolerance was the wrong unit, and folding costs precision
 
 *Expected:* the forward-pass cross-check would agree with the reference to
