@@ -49,3 +49,21 @@ markers = [
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+
+# Pinned rather than left to the default, so that "ruff is clean" means the
+# same thing on a contributor's machine, in CI, and in six months' time.  The
+# set is deliberately modest: correctness and obvious-bug rules, plus the
+# import and comprehension hygiene that keeps diffs small.  Style arguments
+# that a reader could reasonably go either way on are left out.
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "C4", "UP", "RUF", "PLE"]
+ignore = [
+  # Long lines inside docstrings carry derivations and tables that wrap badly;
+  # the formatter keeps code within the limit and prose is checked by eye.
+  "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests build configs from a shared dict of keyword arguments, which is clearer
+# than repeating six fields in every case.
+"tests/*" = ["C408"]

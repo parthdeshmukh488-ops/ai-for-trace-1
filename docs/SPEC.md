@@ -866,3 +866,61 @@ needs backward passes.
 Append dated entries here when the specification is found to be wrong, with
 what was changed and why. An empty section means nothing has been found yet,
 not that nothing is wrong.
+
+### 2026-11-08 — value sets are keyed on node type, not on encoding
+
+**Was:** §2.2 and the `value_set` function derived a node's finite value set
+from its *encoding*, returning nothing for a numerical node.
+
+**Why that was wrong:** a node's encoding is how it sits in the residual
+stream; its support is which values it can take. Those are independent.
+`SelectorWidth` is numerical — a count read out of attention is naturally a
+magnitude — but its support is exactly `0..max_len` and is perfectly well
+known. Keying on the encoding made every `Map` over a width unbounded, which
+rules out every counting program in the suite: `hist`, `sort`, `most_freq`,
+and the rank construction all of them are built from. The error was found by
+the first program written against the interpreter.
+
+**Now:** the function is `support` and its rules key on node type.
+`SelectorWidth` reports `0..max_len`. Unboundedness propagates without
+raising; only the compiler treats it as fatal, and only for a node it has to
+allocate a one-hot block for. `tests/test_lang.py::test_support_of_selector_
+width_is_bounded_although_numerical` is the regression test and says why.
+
+### 2026-11-08 — a declared support, for turning a magnitude into a category
+
+**Was:** nothing. §2.2 had no way to discretise a numerical variable.
+
+**Why that was a gap:** a numerical variable's support genuinely is not
+enumerable by forward propagation — the mean of a prefix of plus and minus
+ones takes a different set of values at every length — but a *discretisation*
+of it, `lambda m: "neg" if m < 0 else "pos"`, obviously has a small one.
+Without a way to say so, no program that asks a numerical question compiles,
+which rules out `dyck1`, `pair_balance` and anything else built on a running
+count.
+
+**Now:** `Map` and `SequenceMap` take an optional `declared_support`. It is a
+claim by the author, not a derivation, and the compiler verifies it
+exhaustively over the input space before emitting any weights — so a wrong
+declaration is a compile error rather than a model that is wrong on inputs
+nobody tried. The escape hatch is narrow and checked, which is the only reason
+it is acceptable.
+
+### 2026-11-08 — `ModelConfig` details settled during phase 0
+
+Three small things the specification left implicit, resolved in code and
+recorded here rather than left to be rediscovered:
+
+* `d_head` is allowed to be independent of `d_model / n_heads`. Compiled
+  models need this: their width is the sum of their variables' one-hot blocks,
+  which is whatever the program needs, and padding the residual stream to a
+  multiple of the head count would add dimensions that mean nothing — in the
+  one regime whose entire value is that every dimension means something.
+* `act_fn` gains `"identity"`. Phase 4's validation test needs a configuration
+  in which the model is linear and the first-order attribution estimate is
+  therefore *exact*; without it, the error that experiment measures cannot be
+  separated from a sign bug in the estimator.
+* The activation functions are enumerated in `ACT_FNS` and validated at
+  construction, because `gelu_tanh` against `gelu_exact` is a ~1e-3 difference
+  in activation space — above the cross-check tolerance in §1.7 — and
+  mistyping it should fail loudly rather than quietly.
