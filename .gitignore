@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.venv/
+venv/
+*.npy
+*.npz
+.DS_Store
+
+# Model weights and activation caches are large and re-downloadable or
+# re-derivable; results/*.json and results/*.png are the artefacts worth
+# keeping, never the tensors behind them.
+weights/
+checkpoints/
+*.pt
+*.safetensors
+activations/
+
+# Smoke-test output from `--quick` experiment runs; never a result.
+*_quick.json

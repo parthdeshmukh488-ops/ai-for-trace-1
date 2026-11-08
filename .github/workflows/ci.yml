@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Every job here runs on CPU-only runners, and the CPU wheels are an order of
+  # magnitude smaller than the CUDA ones.  Without this the install dominates
+  # the run time of the whole workflow.
+  PIP_EXTRA_INDEX_URL: https://download.pytorch.org/whl/cpu
+
+jobs:
+  test:
+    name: tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run test suite
+        run: pytest tests/ -q -m "not slow and not gpu"
+
+  coverage:
+    name: coverage, oracle cross-check and experiments
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package, test and oracle dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,plot,oracle]"
+
+      # The suite is the project's main correctness claim, so the floor is
+      # enforced rather than merely reported.
+      - name: Coverage
+        run: >
+          pytest tests/ -q -m "not gpu" --cov=circuitry
+          --cov-report=term-missing --cov-fail-under=93
+
+      # An independently written transformer is the strongest available oracle
+      # for this one: if circuitry's from-scratch forward pass and the
+      # reference implementation agree on every activation site to machine
+      # precision, both are very unlikely to be wrong in the same way.  Every
+      # attribution number in the repository is downstream of this agreeing.
+      - name: Cross-check the forward pass against the reference implementation
+        run: python benchmarks/cross_check_reference.py
+
+      # Short end-to-end runs of every experiment, so the figures in the
+      # README stay reproducible rather than becoming stale artefacts.
+      - name: Experiment pipelines smoke test
+        run: |
+          for script in compiler_fidelity attribution_error ablation_choice \
+                        discovery_roc dictionary_recovery grokking_circuit \
+                        steering_cost; do
+            PYTHONPATH=experiments python experiments/$script.py --quick
+          done
+
+      - name: Examples smoke test
+        run: |
+          python examples/01_hooks_and_patching.py
+          python examples/02_compiled_ground_truth.py
+          python examples/03_dictionaries.py

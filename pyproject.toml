@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circuitry"
+version = "0.1.0"
+description = "Mechanistic interpretability, measured against circuits that are known by construction"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = [
+  "mechanistic-interpretability",
+  "sparse-autoencoder",
+  "activation-patching",
+  "circuit-discovery",
+  "transformers",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["numpy>=1.24", "torch>=2.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-cov>=4.1"]
+# The reference implementation the engine's forward pass is measured against.
+# Tests that need it skip cleanly when it is absent, which is why CI installs
+# it explicitly rather than relying on it being present.
+oracle = ["transformers>=4.40", "tokenizers>=0.19"]
+plot = ["matplotlib>=3.7"]
+data = ["datasets>=2.18"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+  "slow: dictionary training and full-model sweeps",
+  "oracle: requires transformers for the independent forward-pass cross-check",
+  "gpu: requires CUDA; skipped on CPU-only runners",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
