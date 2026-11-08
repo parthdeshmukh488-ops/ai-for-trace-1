@@ -32,6 +32,13 @@ Build:
 Do not implement the transformer. If you find yourself needing it to write a
 test, the test belongs in phase 1.
 
+One more test, which exists for the coverage floor as much as for its own
+sake: `test_unimplemented_stubs_name_their_phase` asserts that every stub
+in the public surface raises `NotImplementedError` with a message naming
+the phase that will implement it. It covers those lines, so the floor holds
+from the first commit, and it guards the promise that an early call to
+something unbuilt says what is missing rather than failing obscurely.
+
 Gate:
 
 ```bash

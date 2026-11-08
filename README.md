@@ -225,7 +225,8 @@ going red.
 ## A note on method
 
 No number appears in this README until the experiment that produces it has
-been run; until then it is a `[[Mx]]` marker. A placeholder is embarrassing in
+been run; until then it is a bracketed placeholder. One of those is
+embarrassing in
 a way that a plausible invented number is not, which is the only reason the
 convention holds.
 
