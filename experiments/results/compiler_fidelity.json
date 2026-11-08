@@ -1,0 +1,2094 @@
+{
+  "chosen_scale": 40.0,
+  "metadata": {
+    "command": "python experiments/compiler_fidelity.py",
+    "device": "cpu",
+    "git_sha": "56ba328",
+    "max_len": 5,
+    "scope": "full",
+    "seed": 0,
+    "versions": {
+      "python": "3.13.18",
+      "torch": "2.15.0+cpu"
+    },
+    "wall_seconds": 6.59
+  },
+  "programs": {
+    "dyck1": {
+      "depth": 6,
+      "exercises": "two counts, a difference, and a running or",
+      "graph": {
+        "edges": 16,
+        "nodes": 10,
+        "unused_heads": 9
+      },
+      "model": {
+        "d_head": 7,
+        "d_mlp": 66,
+        "d_model": 61,
+        "n_heads": 2,
+        "n_layers": 6
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.5,
+            "first_failure": {
+              "expected": [
+                "P"
+              ],
+              "got": [
+                "F"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.5483870967741935,
+            "first_failure": {
+              "expected": [
+                "P",
+                "P",
+                "P"
+              ],
+              "got": [
+                "F",
+                "F",
+                "F"
+              ],
+              "input": [
+                "(",
+                "(",
+                "("
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.5,
+            "first_failure": {
+              "expected": [
+                "P"
+              ],
+              "got": [
+                "F"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.5483870967741935,
+            "first_failure": {
+              "expected": [
+                "P",
+                "P",
+                "P"
+              ],
+              "got": [
+                "F",
+                "F",
+                "F"
+              ],
+              "input": [
+                "(",
+                "(",
+                "("
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "hist": {
+      "depth": 2,
+      "exercises": "a count, decoded from the BOS weight",
+      "graph": {
+        "edges": 2,
+        "nodes": 3,
+        "unused_heads": 0
+      },
+      "model": {
+        "d_head": 3,
+        "d_mlp": 12,
+        "d_model": 10,
+        "n_heads": 1,
+        "n_layers": 1
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.1935483870967742,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2",
+                "1"
+              ],
+              "got": [
+                "2",
+                "2",
+                "2"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.8387096774193549,
+            "first_failure": {
+              "expected": [
+                "4",
+                "4",
+                "4",
+                "4",
+                "1"
+              ],
+              "got": [
+                "4",
+                "4",
+                "4",
+                "4",
+                "2"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.1935483870967742,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2",
+                "1"
+              ],
+              "got": [
+                "2",
+                "2",
+                "2"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.8387096774193549,
+            "first_failure": {
+              "expected": [
+                "4",
+                "4",
+                "4",
+                "4",
+                "1"
+              ],
+              "got": [
+                "4",
+                "4",
+                "4",
+                "4",
+                "2"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "most_freq": {
+      "depth": 4,
+      "exercises": "count, then rank by the count",
+      "graph": {
+        "edges": 8,
+        "nodes": 7,
+        "unused_heads": 1
+      },
+      "model": {
+        "d_head": 31,
+        "d_mlp": 30,
+        "d_model": 55,
+        "n_heads": 1,
+        "n_layers": 4
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.12903225806451613,
+            "first_failure": {
+              "expected": [
+                "a"
+              ],
+              "got": [
+                "_"
+              ],
+              "input": [
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.8064516129032258,
+            "first_failure": {
+              "expected": [
+                "a",
+                "a",
+                "b"
+              ],
+              "got": [
+                "_",
+                "a",
+                "b"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.12903225806451613,
+            "first_failure": {
+              "expected": [
+                "a"
+              ],
+              "got": [
+                "_"
+              ],
+              "input": [
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.8064516129032258,
+            "first_failure": {
+              "expected": [
+                "a",
+                "a",
+                "b"
+              ],
+              "got": [
+                "_",
+                "a",
+                "b"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "pair_balance": {
+      "depth": 2,
+      "exercises": "the numerical aggregate and read-out",
+      "graph": {
+        "edges": 3,
+        "nodes": 3,
+        "unused_heads": 1
+      },
+      "model": {
+        "d_head": 6,
+        "d_mlp": 2,
+        "d_model": 10,
+        "n_heads": 1,
+        "n_layers": 2
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.622459352016449"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 1.1531872749328613,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 3.2782554615362614e-08,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9975274205207825"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.002521812915802002,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9996646642684937"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.0003362894058227539,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.7310585975646973"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.7597664594650269,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9999938011169434"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 6.198883056640625e-06,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 1.1920928955078125e-07,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.8807970285415649"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.23321294784545898,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 3.2782554615362614e-08,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 3.2782554615362614e-08,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 3.2782554615362614e-08,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9820137619972229"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.02059459686279297,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.6224593312018546"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 1.1531872471362845,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 1.1102230246251565e-16,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9975273768433653"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.0025215934972990794,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9996646498695336"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.00033624995864567353,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.7310585786300049"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.7597664338676736,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9999938558253978"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 6.144476610292493e-06,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 1.1253526333021568e-07,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.8807970779778823"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.23321272411699212,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 2.06115369216775e-09,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 3.775135759553905e-11,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 1.2656542480726785e-14,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 0.0,
+            "first_failure": {
+              "expected": [
+                "1.0"
+              ],
+              "got": [
+                "0.9820137900379085"
+              ],
+              "input": [
+                "("
+              ]
+            },
+            "max_error": 0.020594503674271403,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "reverse": {
+      "depth": 3,
+      "exercises": "a count feeding index arithmetic",
+      "graph": {
+        "edges": 6,
+        "nodes": 5,
+        "unused_heads": 1
+      },
+      "model": {
+        "d_head": 6,
+        "d_mlp": 30,
+        "d_model": 28,
+        "n_heads": 1,
+        "n_layers": 3
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.7096774193548387,
+            "first_failure": {
+              "expected": [
+                "b",
+                "a",
+                "a",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a",
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.7096774193548387,
+            "first_failure": {
+              "expected": [
+                "b",
+                "a",
+                "a",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a",
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "shift": {
+      "depth": 2,
+      "exercises": "index arithmetic and one aggregate",
+      "graph": {
+        "edges": 3,
+        "nodes": 3,
+        "unused_heads": 1
+      },
+      "model": {
+        "d_head": 6,
+        "d_mlp": 5,
+        "d_model": 16,
+        "n_heads": 1,
+        "n_layers": 2
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.06451612903225806,
+            "first_failure": {
+              "expected": [
+                "_",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.2903225806451613,
+            "first_failure": {
+              "expected": [
+                "_",
+                "a",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.06451612903225806,
+            "first_failure": {
+              "expected": [
+                "_",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.2903225806451613,
+            "first_failure": {
+              "expected": [
+                "_",
+                "a",
+                "a"
+              ],
+              "got": [
+                "a",
+                "a",
+                "a"
+              ],
+              "input": [
+                "a",
+                "a",
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "sort": {
+      "depth": 3,
+      "exercises": "rank by a pair, then gather",
+      "graph": {
+        "edges": 5,
+        "nodes": 5,
+        "unused_heads": 1
+      },
+      "model": {
+        "d_head": 11,
+        "d_mlp": 12,
+        "d_model": 28,
+        "n_heads": 1,
+        "n_layers": 3
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.12903225806451613,
+            "first_failure": {
+              "expected": [
+                "a"
+              ],
+              "got": [
+                "_"
+              ],
+              "input": [
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.5,
+            "first_failure": {
+              "expected": [
+                "a",
+                "a",
+                "b"
+              ],
+              "got": [
+                "_",
+                "a",
+                "b"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.12903225806451613,
+            "first_failure": {
+              "expected": [
+                "a"
+              ],
+              "got": [
+                "_"
+              ],
+              "input": [
+                "a"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.5,
+            "first_failure": {
+              "expected": [
+                "a",
+                "a",
+                "b"
+              ],
+              "got": [
+                "_",
+                "a",
+                "b"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    },
+    "two_hop": {
+      "depth": 2,
+      "exercises": "two chained lookups: the composition case",
+      "graph": {
+        "edges": 1,
+        "nodes": 2,
+        "unused_heads": 0
+      },
+      "model": {
+        "d_head": 6,
+        "d_mlp": 1,
+        "d_model": 13,
+        "n_heads": 1,
+        "n_layers": 1
+      },
+      "n_inputs": 363,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.7823691460055097,
+            "first_failure": {
+              "expected": [
+                "-1",
+                "-1"
+              ],
+              "got": [
+                "2",
+                "2"
+              ],
+              "input": [
+                "2",
+                "2"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 363
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "2.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.7823691460055097,
+            "first_failure": {
+              "expected": [
+                "-1",
+                "-1"
+              ],
+              "got": [
+                "2",
+                "2"
+              ],
+              "input": [
+                "2",
+                "2"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 363
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "2.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 363
+          }
+        }
+      },
+      "vocab_size": 3
+    },
+    "unique": {
+      "depth": 4,
+      "exercises": "two chained counts over a custom predicate",
+      "graph": {
+        "edges": 9,
+        "nodes": 8,
+        "unused_heads": 3
+      },
+      "model": {
+        "d_head": 11,
+        "d_mlp": 25,
+        "d_model": 51,
+        "n_heads": 1,
+        "n_layers": 5
+      },
+      "n_inputs": 62,
+      "per_dtype": {
+        "float32": {
+          "1.0": {
+            "exact_match_rate": 0.8064516129032258,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2"
+              ],
+              "got": [
+                "1",
+                "1"
+              ],
+              "input": [
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.1935483870967742,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2",
+                "2"
+              ],
+              "got": [
+                "1",
+                "1",
+                "1"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        },
+        "float64": {
+          "1.0": {
+            "exact_match_rate": 0.8064516129032258,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2"
+              ],
+              "got": [
+                "1",
+                "1"
+              ],
+              "input": [
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "100.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "12.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "16.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "2.0": {
+            "exact_match_rate": 0.1935483870967742,
+            "first_failure": {
+              "expected": [
+                "2",
+                "2",
+                "2"
+              ],
+              "got": [
+                "1",
+                "1",
+                "1"
+              ],
+              "input": [
+                "a",
+                "a",
+                "b"
+              ]
+            },
+            "max_error": 1.0,
+            "n_inputs": 62
+          },
+          "24.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "32.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "4.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "40.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "48.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "64.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          },
+          "8.0": {
+            "exact_match_rate": 1.0,
+            "first_failure": null,
+            "max_error": 0.0,
+            "n_inputs": 62
+          }
+        }
+      },
+      "vocab_size": 2
+    }
+  },
+  "scale_sufficient_for_all": true,
+  "smallest_exact_scale": {
+    "dyck1": 4.0,
+    "hist": 4.0,
+    "most_freq": 4.0,
+    "pair_balance": 32.0,
+    "reverse": 2.0,
+    "shift": 4.0,
+    "sort": 4.0,
+    "two_hop": 2.0,
+    "unique": 4.0
+  }
+}

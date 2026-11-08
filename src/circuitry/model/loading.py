@@ -274,6 +274,8 @@ def to_reference(model: Transformer):
         raise ValueError(f"the reference implementation uses gelu_new; this model uses {cfg.act_fn}")
     if not cfg.use_ln or cfg.positional != "learned":
         raise ValueError("the reference implementation assumes LayerNorm and learned positions")
+    if not cfg.causal:
+        raise ValueError("the reference implementation is a causal decoder; this model is not")
     if cfg.n_heads * cfg.d_head != cfg.d_model:
         raise ValueError(
             f"the reference implementation requires n_heads*d_head == d_model; got "

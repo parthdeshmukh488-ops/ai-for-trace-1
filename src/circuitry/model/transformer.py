@@ -16,7 +16,8 @@ wrong in the same way.
 Three decisions worth stating, because each one is a place where a plausible
 alternative would quietly spoil a measurement.
 
-* **The causal mask is re-applied after the ``scores`` hook.**  Masked entries
+* **The causal mask is re-applied after the ``scores`` hook**, when there is
+  one -- see ``ModelConfig.causal``.  Masked entries
   are not a place where information may be injected: patching one must be a
   no-op, not a behaviour change, or an experiment sweeping "every entry of the
   attention pattern" would spend half its measurements letting the model see
@@ -133,13 +134,16 @@ class Attention(nn.Module):
 
         raw = torch.einsum("bqhk,bshk->bhqs", q, k) / math.sqrt(self.cfg.d_head)
         seq = normed.shape[1]
-        causal = mask[:seq, :seq]
-        neg_inf = torch.finfo(raw.dtype).min
-        raw = raw.masked_fill(causal, neg_inf)
-        scores = hooks(f"{p}.scores", raw)
-        # Masked again: a masked entry is not a channel, so patching one is a
-        # no-op by contract.  See the module docstring.
-        scores = scores.masked_fill(causal, neg_inf)
+        if self.cfg.causal:
+            causal = mask[:seq, :seq]
+            neg_inf = torch.finfo(raw.dtype).min
+            raw = raw.masked_fill(causal, neg_inf)
+            scores = hooks(f"{p}.scores", raw)
+            # Masked again: a masked entry is not a channel, so patching one is
+            # a no-op by contract.  See the module docstring.
+            scores = scores.masked_fill(causal, neg_inf)
+        else:
+            scores = hooks(f"{p}.scores", raw)
         pattern = hooks(f"{p}.pattern", torch.softmax(scores, dim=-1))
 
         z = hooks(f"{p}.z", torch.einsum("bhqs,bshk->bqhk", pattern, v))

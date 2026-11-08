@@ -7,6 +7,16 @@ model, the shape assertions in every test.  A config that can be edited after
 a cache has been built from it is a way of producing results whose stated
 shape is not the shape they were computed at.
 
+``causal`` is the other field a reader might not expect to be optional.
+Decoder-only language models are causal and that is the default, but a
+*compiled* model is not: the program language this project compiles from lets
+a position read any other position, and ``reverse`` or ``two_hop`` ask position
+1 for the contents of position 2.  Those programs cannot be realised with a
+causal mask at all, so compiled models set ``causal=False`` and the mask is
+simply not applied.  This is a real difference between the compiled regime and
+the trained one, and it is recorded in the compiled model's own caveats rather
+than glossed over.
+
 ``d_head`` is allowed to be independent of ``d_model / n_heads``.  Real
 checkpoints always have ``n_heads * d_head == d_model``, but compiled models
 (see :mod:`circuitry.symbolic`) do not: their width is the sum of their
@@ -49,6 +59,7 @@ class ModelConfig:
     use_ln: bool = True
     positional: str = "learned"
     tie_unembed: bool = True
+    causal: bool = True
     dtype: str = "float32"
 
     def __post_init__(self) -> None:

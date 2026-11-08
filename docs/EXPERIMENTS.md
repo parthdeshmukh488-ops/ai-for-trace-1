@@ -53,8 +53,40 @@ boundary marked.
 
 **Compute.** CPU, minutes.
 
-**Result.** *(fill in: chosen scale, which programs needed the most, where fp32
-gave out)*
+**Result.** All nine programs reach exact agreement with the interpreter, and
+a single shared scale of **40** is sufficient for all of them.
+
+| quantity | measured |
+|---|---|
+| programs exact at every scale from 4 upward | 8 of 9 |
+| the exception, and the scale it needs | `pair_balance`, 32 |
+| error decay with scale (`pair_balance`) | `exp(-0.51 * lambda)` |
+| predicted decay from the half-score BOS path | `exp(-0.50 * lambda)` |
+| float32 worst error at scale 100 | 3.3e-8 (`pair_balance`); 0 for the other eight |
+| float64 worst error at scale 100 | 1.1e-16 |
+
+All three parts of the hypothesis survived, and the second was sharper than
+expected:
+
+* There is a threshold above which every program is exactly right, and it is
+  40 with margin.
+* The failures do concentrate on the empty-selection path, and the reason is
+  quantitative: the beginning-of-sequence position sits at *half* score so
+  that it loses to any match and beats any non-match, which makes its residual
+  weight `exp(-lambda/2)` rather than `exp(-lambda)`. The measured decay of
+  0.51 against a predicted 0.50 confirms it, and the analytic threshold of
+  27.6 brackets the measured fail-at-24 / pass-at-32 exactly.
+* What actually binds is the *read-out*, not the attention. Eight programs end
+  in a categorical argmax, which tolerates a 1e-7 perturbation without
+  noticing; the ninth reads a magnitude back and is compared at 1e-6, so it
+  sets the scale for the whole suite.
+
+**Where the protocol was wrong.** It predicted float32 would overflow and
+bound the scale from above. It does not — softmax subtracts the row maximum
+before exponentiating, so there is nothing to overflow, and float32 is exactly
+right for every program at every scale tested. The only float32 cost is
+precision on the one magnitude read-out. Compiled models remain float64, for a
+smaller reason than the specification gave.
 
 ---
 

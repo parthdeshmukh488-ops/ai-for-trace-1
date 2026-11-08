@@ -178,8 +178,16 @@ def test_selector_width_counts_matches():
     assert evaluate(width, list("aabca")) == [3, 3, 1, 1, 3]
 
 
-def test_selector_width_is_numerical_regardless_of_the_argument():
-    width = SelectorWidth(Select(tokens, tokens, Predicate.EQ), encoding=Encoding.CATEGORICAL)
+def test_selector_width_is_categorical_by_default():
+    """A count is a discrete value with a known support, so one-hot is the useful form."""
+    width = SelectorWidth(Select(tokens, tokens, Predicate.EQ))
+    assert width.encoding == Encoding.CATEGORICAL
+    assert support(width, "ab", 4)[id(width)] == (0, 1, 2, 3, 4)
+
+
+def test_selector_width_may_be_declared_numerical():
+    """Which is what you want when the count is going to be averaged."""
+    width = SelectorWidth(Select(tokens, tokens, Predicate.EQ), encoding=Encoding.NUMERICAL)
     assert width.encoding == Encoding.NUMERICAL
 
 

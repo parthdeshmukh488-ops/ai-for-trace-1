@@ -18,11 +18,11 @@ from .model import ACT_FNS, ModelConfig, sites
 from .model.hooks import capture, intervene
 from .model.loading import load_gpt2
 from .model.transformer import Transformer
+from .symbolic import compile_program
 
 # Name -> the phase of docs/BUILD_PLAN.md that implements it.  Entries are
 # deleted from here as each phase lands, and the real object is imported above.
 _PENDING: dict[str, int] = {
-    "compile_program": 2,
     "patch": 3,
     "path_patch": 3,
     "Circuit": 3,

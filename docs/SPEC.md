@@ -906,6 +906,109 @@ declaration is a compile error rather than a model that is wrong on inputs
 nobody tried. The escape hatch is narrow and checked, which is the only reason
 it is acceptable.
 
+### 2026-11-08 — compiled models cannot be causal
+
+**Was:** §2 described the compilation scheme without saying anything about the
+attention mask, and §1 had no way to turn one off.
+
+**Why that was wrong:** the language lets a position read any other position.
+`reverse` asks position 1 for the contents of position `n-2`; `two_hop` asks
+position `i` for position `tokens[i]`, which points forwards about half the
+time. Neither can be realised with a causal mask at all. The first working
+compiler produced a `two_hop` model that was right wherever the lookup
+happened to point backwards and returned its default wherever it pointed
+forwards — a model that passes a casual glance and is simply a different
+function.
+
+**Now:** `ModelConfig` has a `causal` field, the engine applies the mask only
+when it is set, and `compile_program` sets it false. This is a real difference
+between the compiled regime and the trained decoder-only models of phase 8,
+and it joins the caveats in §2.5 rather than being glossed over. The
+reference-implementation export refuses a non-causal model, since GPT-2 is a
+causal decoder.
+
+### 2026-11-08 — a count is categorical, and the step decoder that makes it work
+
+**Was:** §2.2 made `SelectorWidth` numerical.
+
+**Why that was wrong in practice:** a count is a discrete value whose support
+is always `0..max_len`, and everything a program does with a count — index
+with it, compare it, feed it to a lookup table — wants a one-hot. Leaving it
+as a magnitude meant every counting program needed an explicit decode step
+that the author had to write and the compiler had to be taught anyway.
+
+**Now:** `SelectorWidth` is categorical by default, with `NUMERICAL` still
+available for the case where the count is going to be averaged. The decode is
+the compiler's job, and it is done by a general **step decoder**: given a
+variable whose achievable values are known and finite, one unit step per value
+placed at the midpoint between consecutive values, summed telescopically so
+the output at `v_j` is exactly `f(v_j)`. Each step is two ReLU neurons
+separated by half the smallest gap in the support, which makes it exactly 0 or
+1 on the values that occur. Two neurons per value, and the same machinery
+serves the `SelectorWidth` inversion and any `Map` over a bounded magnitude.
+
+### 2026-11-08 — `SelectorWidth` occupies both slots of its layer
+
+A scheduling bug rather than a specification error, recorded because the
+symptom was so misleading. A head at layer `L` writes before that layer's MLP
+reads, so its output is readable at `(L, mlp)`. But `SelectorWidth` needs
+*both* — a head for the beginning-of-sequence weight and that layer's MLP to
+decode it — so its value is written by the MLP and is not available until
+`L+1`. Treating it as a plain head put every `Map` over a count into the very
+MLP that produces the count, reading a block that was still zero.
+
+`reverse` compiled to a model that returned its default at every position.
+`sort` worked, but only because its consumer was an aggregate and was bumped
+to the next layer for an unrelated reason — so the bug was invisible in two
+thirds of the suite. The variable tracer (`CompiledModel.trace`) found it in
+one run by showing `length` correct and `target` frozen at its support
+minimum; that method exists because of this.
+
+### 2026-11-08 — Dyck-2 is not expressible in this language
+
+**Was:** §2.6 listed `dyck2` — bracket matching with two bracket types — as a
+four-deep program in the suite.
+
+**Why it cannot be done:** checking a closing bracket's type against its
+matching opener means finding the *most recent unmatched opener at the current
+depth*. "Most recent among the positions satisfying a condition that depends
+on the query" is a three-index quantity: a selector produces one boolean per
+`(query, key)` pair, and ranking the selected keys *within each query's own
+selection* is not expressible by any composition of selectors and aggregates.
+Dyck-1 needs no such ranking, because a count of openers minus a count of
+closers suffices, and a running check for "has the balance ever been negative"
+is another count.
+
+This is a property of the language, not of the implementation, and it is
+consistent with Dyck-k for k >= 2 being the standard example of what these
+languages cannot express.
+
+**Now:** `unique` — the number of distinct tokens, two chained counts over a
+custom predicate — takes the slot as the second four-deep composed program.
+The suite is nine programs, as specified, and `docs/EXPERIMENTS.md` reports
+per program.
+
+### 2026-11-08 — the default logit scale is 40, and float32 does not overflow
+
+**Was:** §2.4 left the scale to be chosen from the fidelity sweep, and the
+experiment's protocol predicted that float32 would overflow and bound it from
+above.
+
+**What the sweep measured:** the worst error over all inputs falls as
+`exp(-0.51 * lambda)`, against a prediction of exactly one half from the
+half-score beginning-of-sequence construction. Eight of the nine programs are
+exactly right from a scale of 4, because a one-hot argmax is unbothered by a
+perturbation of 1e-7. The binding constraint is `pair_balance`, the only
+program whose output is a magnitude read back directly: its tolerance is 1e-6,
+so it needs `lambda > 2 ln(1e6) = 27.6`, and it is measured to fail at 24 and
+succeed at 32. The default is therefore 40, with margin.
+
+float32 does **not** overflow, at any scale tested up to 100: `torch.softmax`
+subtracts the row maximum before exponentiating, so there is nothing to
+overflow. Its only cost is on the one program that reads a magnitude back,
+where the floor is 3.3e-8 against float64's 1.1e-16. Compiled models stay
+float64 for that reason, which is a smaller reason than the specification gave.
+
 ### 2026-11-08 — the cross-check bound is relative to the activation scale
 
 **Was:** §1.7 set the pass condition at `max_abs < 1e-4` in float32.

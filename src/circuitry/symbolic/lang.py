@@ -54,6 +54,7 @@ from typing import ClassVar
 
 __all__ = [
     "Aggregate",
+    "CompileError",
     "Encoding",
     "IllDefinedAggregate",
     "Map",
@@ -71,6 +72,16 @@ __all__ = [
     "support",
     "tokens",
 ]
+
+
+class CompileError(ValueError):
+    """A program that cannot be compiled, with the reason and the node.
+
+    Defined here rather than in the compiler so that the allocator can raise
+    it too: "this variable's support cannot be bounded, so it cannot be stored
+    one-hot" is a compile error whichever module notices it first, and a
+    caller should not have to catch two exception types for one condition.
+    """
 
 
 class IllDefinedAggregate(ValueError):
@@ -319,18 +330,20 @@ class Aggregate(SOp):
 class SelectorWidth(SOp):
     """How many keys each query selects.
 
-    Always ``NUMERICAL`` as computed, but almost always immediately wrapped in
-    a ``Map`` back to a categorical value, because that is the form the rest
-    of a program can index with.  The compiler implements it as attention to
-    the beginning-of-sequence symbol followed by a lookup table, so it costs a
-    head and an MLP.
+    Categorical by default, with support ``0..max_len``.  A count is a discrete
+    value, its support is always known, and making it categorical is what lets
+    it be used immediately as a selector key, a lookup-table input or a
+    ``SequenceMap`` operand -- which is what every counting program does with
+    it.  Declaring it ``NUMERICAL`` is still allowed and is what you want when
+    the count is going to be averaged rather than indexed with.
+
+    Either way the compiler realises it as attention to the
+    beginning-of-sequence symbol, whose weight comes out as ``1/(n+1)``,
+    followed by a lookup table that inverts that into the count.  So it costs
+    a head and an MLP.
     """
 
     selector: Selector
-
-    def __post_init__(self) -> None:
-        self.encoding = Encoding.NUMERICAL
-        super().__post_init__()
 
     @property
     def operands(self) -> tuple[Selector, ...]:
