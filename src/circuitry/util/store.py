@@ -161,19 +161,74 @@ class ActivationStore:
         )
 
 
-class ShuffleBuffer:  # pragma: no cover - implemented in phase 6
+class ShuffleBuffer:
     """A streaming, shuffling activation source for dictionary training.
 
-    Deliberately not implemented yet.  Training a sparse autoencoder on GPT-2
-    residuals needs more activations than fit in memory, and the buffer's size
-    is a confound rather than a detail: consecutive tokens from one document
-    are correlated, so a small buffer makes the dictionary fit document
-    structure instead of features.  It lands in phase 6 together with the
-    decorrelation test that measures whether it works.
+    Training a sparse autoencoder on a language model's residuals needs more
+    activations than fit in memory, so they arrive as a stream of forward
+    passes.  The trouble is that a stream of forward passes is *ordered*:
+    consecutive rows come from consecutive tokens of the same document, and
+    they are strongly correlated.  A dictionary trained on that learns document
+    structure instead of features, and nothing about its reconstruction loss
+    says so.
+
+    So rows are pooled into a buffer and drawn from it at random.  The buffer's
+    *size* is therefore a confound rather than a detail -- a buffer of one
+    batch does no shuffling at all -- and it is reported with every run.
+    ``tests/test_store.py`` measures the decorrelation it achieves rather than
+    assuming it.
+
+    The refill policy is to top up whenever the buffer drops below half
+    capacity, which keeps the mixing depth roughly constant instead of letting
+    it decay as the buffer drains.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
-        raise NotImplementedError(
-            "ShuffleBuffer lands in phase 6, with its decorrelation test; "
-            "see docs/BUILD_PLAN.md"
-        )
+    def __init__(
+        self,
+        source,
+        *,
+        capacity: int,
+        batch_size: int,
+        generator: torch.Generator | None = None,
+    ) -> None:
+        if capacity < batch_size:
+            raise ValueError(
+                f"capacity {capacity} is below the batch size {batch_size}; the buffer "
+                "would do no shuffling at all"
+            )
+        self._source = iter(source)
+        self.capacity = capacity
+        self.batch_size = batch_size
+        self._generator = generator or torch.Generator()
+        self._buffer: torch.Tensor | None = None
+        self.exhausted = False
+        self.rows_seen = 0
+
+    def _refill(self) -> None:
+        chunks = [] if self._buffer is None else [self._buffer]
+        have = 0 if self._buffer is None else self._buffer.shape[0]
+        while have < self.capacity and not self.exhausted:
+            try:
+                chunk = next(self._source)
+            except StopIteration:
+                self.exhausted = True
+                break
+            chunk = chunk.reshape(-1, chunk.shape[-1]).detach()
+            chunks.append(chunk)
+            have += chunk.shape[0]
+            self.rows_seen += chunk.shape[0]
+        self._buffer = torch.cat(chunks, dim=0) if chunks else None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> torch.Tensor:
+        if self._buffer is None or self._buffer.shape[0] < self.capacity // 2:
+            self._refill()
+        if self._buffer is None or self._buffer.shape[0] < self.batch_size:
+            raise StopIteration
+        order = torch.randperm(self._buffer.shape[0], generator=self._generator)
+        take, keep = order[: self.batch_size], order[self.batch_size :]
+        batch = self._buffer[take]
+        self._buffer = self._buffer[keep]
+        return batch

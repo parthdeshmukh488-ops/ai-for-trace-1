@@ -156,9 +156,65 @@ def test_repr_reports_usage_and_budget():
     assert "KiB" in text
 
 
-def test_shuffle_buffer_names_its_phase():
-    with pytest.raises(NotImplementedError, match="phase 6"):
-        ShuffleBuffer()
+def test_shuffle_buffer_decorrelates_its_stream():
+    """The confound this buffer exists to remove, measured rather than assumed.
+
+    Activations arrive as a stream of forward passes, so consecutive rows come
+    from consecutive tokens of the same document and are strongly correlated.
+    A dictionary trained on that learns document structure instead of
+    features, and its reconstruction loss says nothing about it.
+
+    The stream below is deliberately worse than a real one: each chunk is a
+    single "document" with a large constant offset, so consecutive rows within
+    a chunk are nearly identical.  A buffer that shuffles should break the
+    correlation between successive rows of the batches it yields.
+    """
+    import torch
+
+    chunks = [
+        torch.full((32, 4), float(doc)) + 0.01 * torch.arange(32)[:, None]
+        for doc in range(40)
+    ]
+
+    def correlation(rows: torch.Tensor) -> float:
+        a = rows[:-1, 0]
+        b = rows[1:, 0]
+        if float(a.std()) == 0 or float(b.std()) == 0:
+            return 1.0
+        return float(torch.corrcoef(torch.stack([a, b]))[0, 1].abs())
+
+    # Unshuffled, straight off the stream: successive rows are the same document.
+    raw = torch.cat(chunks)[:256]
+    assert correlation(raw) > 0.99
+
+    buffer = ShuffleBuffer(
+        iter(chunks), capacity=512, batch_size=64,
+        generator=torch.Generator().manual_seed(0),
+    )
+    batches = [next(buffer) for _ in range(4)]
+    shuffled = torch.cat(batches)
+    assert correlation(shuffled) < 0.3, correlation(shuffled)
+    assert buffer.rows_seen > 0
+
+
+def test_shuffle_buffer_refuses_a_capacity_below_its_batch():
+    """It would do no shuffling at all, which is the one thing it is for."""
+    import torch
+
+    with pytest.raises(ValueError, match="no shuffling"):
+        ShuffleBuffer(iter([torch.zeros(8, 2)]), capacity=16, batch_size=32)
+
+
+def test_shuffle_buffer_stops_when_the_stream_runs_out():
+    import torch
+
+    buffer = ShuffleBuffer(
+        iter([torch.zeros(40, 2)]), capacity=32, batch_size=16,
+        generator=torch.Generator().manual_seed(0),
+    )
+    drawn = list(buffer)
+    assert 0 < len(drawn) <= 3
+    assert buffer.exhausted
 
 
 def test_human_readable_sizes_scale_to_tebibytes():
