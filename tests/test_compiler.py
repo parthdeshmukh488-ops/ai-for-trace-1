@@ -314,8 +314,14 @@ def test_unused_components_have_no_influence(name):
 
 @pytest.mark.parametrize("name", ALL)
 def test_ground_truth_edges_match_program_dependencies(name):
-    """Every edge in the emitted graph corresponds to a real data dependency."""
-    from circuitry.symbolic.compiler import _dependencies
+    """Every edge in the emitted graph is a real data dependency, with its port.
+
+    The port is checked too, because it is the part nothing downstream could
+    recover: a head reading a variable as its query is a different edge from
+    one reading it as its value, and the compiler is the only thing that knows
+    which.
+    """
+    from circuitry.symbolic.compiler import _dependency_ports
     from circuitry.symbolic.lang import Selector, nodes_in_order
 
     program, vocab = programs.build(name)
@@ -325,20 +331,30 @@ def test_ground_truth_edges_match_program_dependencies(name):
         for n in nodes_in_order(program)
         if not isinstance(n, Selector) and id(n) in compiled.schedule
     ]
-    # Every dependency between two computed variables must appear as an edge
-    # between the components that compute them.
     node_for = {}
     for gt, variable in compiled.graph.implements:
         node_for.setdefault(variable, gt)
     edges = compiled.graph.edge_set()
     for node in computed:
         dst = node_for[compiled.layout.of(node).name]
-        for dep in _dependencies(node):
+        for dep, port in _dependency_ports(node):
             if id(dep) not in compiled.schedule:
                 continue
             src = node_for[compiled.layout.of(dep).name]
             if src != dst:
-                assert (src, dst) in edges, f"{src} -> {dst} missing for {name}"
+                assert (src, dst, port) in edges, f"{src} -{port}-> {dst} missing for {name}"
+
+
+@pytest.mark.parametrize("name", ALL)
+def test_the_graph_ends_at_the_read_out(name):
+    """The program's answer leaves through the unembedding, which is an edge."""
+    from circuitry.symbolic.truth import Node
+
+    program, vocab = programs.build(name)
+    compiled = compile_program(program, vocab, MAX_LEN, verify=False)
+    sink = Node("logits")
+    assert sink in compiled.graph.nodes
+    assert any(dst == sink and port == "resid" for _src, dst, port in compiled.graph.edges)
 
 
 @pytest.mark.parametrize("name", ALL)
@@ -355,7 +371,7 @@ def test_graph_rejects_an_edge_outside_its_node_set():
 
     a, b = Node("embed"), Node("blocks.0.mlp.out")
     with pytest.raises(AssertionError, match="outside the graph"):
-        GroundTruthGraph((a,), ((a, b),), (), (), "x", ())
+        GroundTruthGraph((a,), ((a, b, "mlp_in"),), (), (), "x", ())
 
 
 # ---------------------------------------------------------------------------

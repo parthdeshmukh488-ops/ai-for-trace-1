@@ -141,15 +141,62 @@ zeroing an activation puts the network in a state it never occupies on any
 input, so the behaviour it destroys may be nothing more than the network
 objecting to being off-distribution.
 
-Because regime 1 has a true circuit, the three can be scored rather than
-argued about: run the same discovery procedure under each counterfactual and
-compare the recovered subgraph to the planted one.
+Because regime 1 has a true circuit, the choices can be scored rather than
+argued about: run the same discovery procedure under each and compare the
+subgraph that comes back. Eight programs, each counterfactual shown at its own
+best threshold, averaged:
 
-| counterfactual | edge precision | edge recall | Jaccard vs resample |
-|---|---|---|---|
-| zero ablation | `[[M2a]]` | `[[M2b]]` | `[[M2c]]` |
-| mean ablation (over the prompt distribution) | `[[M2d]]` | `[[M2e]]` | `[[M2f]]` |
-| resample ablation (matched counterfactual prompts) | `[[M2g]]` | `[[M2h]]` | 1 |
+| counterfactual | precision | recall | edge F1 | ceiling | recall ÷ ceiling | edges kept |
+|---|---|---|---|---|---|---|
+| zero | 0.744 | 0.846 | **0.788** | 0.846 | **1.000** | 10.5 |
+| mean, over the prompt distribution | **0.877** | 0.595 | 0.682 | 0.595 | **1.000** | 6.1 |
+| mean, over positions *(the common bug)* | 0.698 | 0.722 | 0.698 | 0.802 | **0.875** | 8.2 |
+| resample | **0.877** | 0.595 | 0.682 | 0.595 | **1.000** | 6.1 |
+| Gaussian, matched scale | 0.586 | 0.860 | 0.677 | 0.860 | **1.000** | 16.6 |
+
+The "ceiling" column is the fraction of planted edges that have *any* causal
+signal on these prompts. A planted circuit is the program's whole dependency
+graph; a given prompt sample exercises part of it, and an edge with no signal
+cannot be found by any causal method. Reporting recall without that ceiling
+makes a correct method look worse the more thorough the ground truth is.
+
+Three findings, and the first reframes the question.
+
+**The counterfactual does not change how well discovery works. It changes what
+is findable.** Four of the five arms reach their own ceiling on **8 of 8
+programs** — exactly, every time. The large spread in raw recall, from 0.595
+to 0.860, is entirely a spread in the *ceiling*. Zero and Gaussian ablation
+perturb harder, so more edges register as causally live; resample perturbs
+least, so fewer do. None of them is better at discovery.
+
+**Zero ablation wins on F1, and for a reason that should make you uneasy.** It
+gets the best score against the planted graph (0.788) because putting the
+network in a state it occupies on no input makes more of the circuit
+measurable. That is the same property that makes it suspect: the extra signal
+is off-distribution response, not necessarily circuit structure. Gaussian
+ablation shows the cost of pushing that further — the highest ceiling of all
+(0.860) and the worst precision (0.586), keeping 16.6 edges where resample
+keeps 6.1.
+
+**The deliberately-wrong arm is the only one that actually degrades
+discovery.** Averaging over positions rather than over the prompt distribution
+destroys positional information while looking like it preserved the
+distribution. It is the single arm that fails to reach its ceiling — 0.875,
+and 7 of 8 programs instead of 8 — so the common mistake does cost something
+measurable, and it is the only thing here that does.
+
+And the choice genuinely changes the answer. Pairwise agreement between the
+recovered circuits runs from 0.442 (resample against Gaussian) to 1.000 —
+**resample and mean-over-the-prompt-distribution produce the identical circuit
+on every program**, which is worth knowing given how much ink is spent
+choosing between them.
+
+One caveat on this regime, measured: the metric's sampling noise floor is
+**exactly zero** on every compiled program. The output is a one-hot argmax, so
+every prompt pair gives the same normalised level and there is no spread to
+bootstrap. That makes thresholds unusually easy to choose here and is another
+way the compiled laboratory is cleaner than a real model, where the floor is
+what sets the threshold.
 
 *Measured by* [`experiments/ablation_choice.py`](experiments/ablation_choice.py).
 

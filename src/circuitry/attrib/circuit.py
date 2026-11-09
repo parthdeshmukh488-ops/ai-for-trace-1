@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Literal
+from typing import ClassVar, Literal
 
 __all__ = [
     "PORTS",
@@ -114,9 +114,32 @@ class Edge:
     target: Component
     port: str
 
+    #: Which ports each kind of receiver has.  Checked at construction, because
+    #: an edge whose port does not match its target is not merely unusual -- the
+    #: ablation engine looks edges up by ``(layer, port, head)`` and would
+    #: silently never find such an edge, so a typo would quietly remove an edge
+    #: from a circuit rather than raising.
+    _PORTS_BY_KIND: ClassVar[dict[str, tuple[str, ...]]] = {
+        "attn": ("q", "k", "v"),
+        "mlp": ("mlp_in",),
+        "logits": ("resid",),
+    }
+
     def __post_init__(self) -> None:
         if self.port not in PORTS:
             raise ValueError(f"port must be one of {PORTS}, got {self.port!r}")
+        if self.target.kind == "embed":
+            raise ValueError("the embedding has no inputs, so nothing can be an edge into it")
+        allowed = self._PORTS_BY_KIND.get(self.target.kind)
+        if allowed is None:
+            raise ValueError(f"unknown receiver kind {self.target.kind!r}")
+        if self.port not in allowed:
+            raise ValueError(
+                f"{self.target.label} is a {self.target.kind} receiver, whose ports are "
+                f"{allowed}; got {self.port!r}"
+            )
+        if self.source.kind == "logits":
+            raise ValueError("the logit sink has no output, so nothing can be an edge from it")
 
     @property
     def label(self) -> str:
@@ -224,9 +247,8 @@ class Circuit:
             except ValueError:
                 nodes[node] = sink
         edges = set()
-        for src, dst in graph.edges:
+        for src, dst, port in graph.edges:
             if nodes[src] != nodes[dst]:
-                port = "mlp_in" if nodes[dst].kind == "mlp" else "v"
                 edges.add(Edge(nodes[src], nodes[dst], port))
         return Circuit.of(set(nodes.values()), edges, label=label)
 

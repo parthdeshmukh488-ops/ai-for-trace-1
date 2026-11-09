@@ -273,16 +273,64 @@ than its popularity suggests.
   one.
 * Report pairwise Jaccard between the recovered subgraphs.
 
-**Outputs.** `results/ablation_choice.{json,png}`. Figure: grouped bars of
-precision/recall per counterfactual per program, plus a Jaccard heatmap.
+**Outputs.** `results/ablation_choice.{json,png}`. Figure: best edge F1 per
+counterfactual per program, and recall against each arm's own ceiling.
 
 **Pass condition.** Measurement only. The write-up must answer explicitly
-whether the choice changes the *conclusion* — not just the numbers — on at
-least one program.
+whether the choice changes the *conclusion*, not just the numbers, on at least
+one program.
 
-**Compute.** CPU, tens of minutes.
+**Compute.** CPU, 139 seconds for eight programs.
 
-**Result.** *(fill in)*
+**Result.** Eight programs, each counterfactual at its own best threshold:
+
+| counterfactual | precision | recall | edge F1 | ceiling | recall / ceiling | kept |
+|---|---|---|---|---|---|---|
+| zero | 0.744 | 0.846 | **0.788** | 0.846 | 1.000 (8/8) | 10.5 |
+| mean, over the prompt distribution | **0.877** | 0.595 | 0.682 | 0.595 | 1.000 (8/8) | 6.1 |
+| mean, over positions *(the bug)* | 0.698 | 0.722 | 0.698 | 0.802 | **0.875 (7/8)** | 8.2 |
+| resample | **0.877** | 0.595 | 0.682 | 0.595 | 1.000 (8/8) | 6.1 |
+| Gaussian, matched scale | 0.586 | 0.860 | 0.677 | 0.860 | 1.000 (8/8) | 16.6 |
+
+*The hypothesis was that zero ablation would recover a larger circuit than the
+planted one, that resample would be closest to the truth, and that mean would
+sit between them and be worse than its popularity suggests.* **Half right, and
+the half that is wrong reframes the question.**
+
+Zero ablation does recover a larger circuit (10.5 edges against resample's
+6.1) and it does get the best F1 against the planted graph. But not because it
+is more accurate. **The counterfactual does not change how well discovery
+works; it changes what is findable.** Four of the five arms reach their own
+ceiling on 8 of 8 programs, exactly. The entire spread in raw recall, 0.595 to
+0.860, is a spread in the ceiling: zero and Gaussian perturb harder so more
+edges register as causally live, and resample perturbs least.
+
+That reading is uncomfortable for zero ablation rather than flattering. The
+extra signal it creates is response to a state the network occupies on no
+input, and Gaussian ablation shows where that leads: the highest ceiling
+(0.860) and the worst precision (0.586), keeping 16.6 edges where resample
+keeps 6.1.
+
+Resample was not closest to the truth; it was the most conservative. And mean
+over the prompt distribution is not worse than its popularity suggests. It
+produces the **identical circuit to resample on every one of the eight
+programs** (Jaccard 1.000), which is worth knowing given how much is written
+about choosing between them.
+
+*Does the choice change the conclusion?* Yes. Pairwise agreement falls to
+0.442 between resample and Gaussian, so the recovered circuit is substantially
+different and not merely differently sized.
+
+*And the deliberately-wrong arm is the only thing that actually degrades
+discovery.* Mean over positions is the single arm that fails to reach its
+ceiling: 0.875, on 7 of 8 programs. The common mistake costs something
+measurable, and nothing else here does.
+
+**A caveat on the regime, measured.** The metric's sampling noise floor is
+*exactly zero* on every compiled program: the output is a one-hot argmax, so
+every prompt pair gives the same normalised level and there is nothing to
+bootstrap. Choosing a threshold is unusually easy here, and on a real model
+the floor is what sets it.
 
 ---
 
@@ -311,12 +359,59 @@ is below the noise floor of the metric.
   cheap method being 90% as good at 1% of the cost is the decision-relevant
   fact.
 
-**Outputs.** `results/discovery_roc.{json,png}`. Figure: PR curves per
-program; second panel of best-F1 against forward passes across methods.
+**Outputs.** `results/discovery_roc.{json,png}`. Figure: precision against
+recall per program with each program's ceiling marked, and best F1 against
+forward passes across methods.
 
-**Compute.** CPU, ~an hour at full scope.
+**Compute.** CPU, a few minutes for eight programs.
 
-**Result.** *(fill in)*
+**Result.**
+
+| program | depth | edge space | planted | ceiling | greedy F1 | ranking F1 | random F1 |
+|---|---|---|---|---|---|---|---|
+| hist | 2 | 8 | 4 | 0.75 | 0.750 | 0.750 | 0.487 |
+| shift | 2 | 23 | 5 | 0.40 | 0.571 | 0.571 | 0.140 |
+| two_hop | 2 | 8 | 4 | 0.75 | 0.857 | **1.000** | 0.512 |
+| reverse | 3 | 46 | 9 | 0.22 | 0.364 | **0.556** | 0.228 |
+| sort | 3 | 46 | 8 | 0.75 | 0.800 | 0.800 | 0.200 |
+| most_freq | 4 | 77 | 12 | 0.67 | 0.727 | 0.727 | 0.150 |
+| unique | 4 | 116 | 11 | 0.64 | 0.700 | 0.700 | 0.110 |
+| dyck1 | 6 | 388 | 17 | 0.59 | 0.690 | 0.690 | 0.064 |
+| **mean** | | | | | **0.682** | **0.724** | 0.236 |
+
+*The hypothesis was that greedy pruning would beat individual-effect ranking
+on programs with redundancy and tie elsewhere.* **It did not beat it anywhere.
+Greedy wins on 0 of 8 programs, ties on 6, loses on 2, and loses on the
+average.**
+
+Both methods clear the random baseline by a wide margin (0.682 and 0.724
+against 0.236), so discovery is doing real work. But the expensive sequential
+procedure buys nothing here, for two reasons, and the second is a caveat on
+the laboratory itself.
+
+*The mechanism.* Greedy commits each removal, so an edge is judged against the
+model as already pruned. That is what handles redundancy, and it cuts the
+other way too: once a committed removal has broken the circuit, every edge
+downstream of the break costs nothing to cut and goes as well. On `reverse`,
+where the ceiling is lowest (0.22) and the signal thinnest, that is exactly
+what happens: 0.364 against ranking's 0.556.
+
+*The caveat.* Compiled programs have **no redundancy by construction**. Every
+variable has exactly one writer, because the compiler allocates a fresh block
+per variable and never overwrites. So the regime cannot exhibit the structure
+greedy pruning exists to handle, and this measurement says greedy is not
+better *on non-redundant circuits* rather than that greedy is not better. A
+fair test needs a trained model with genuinely redundant paths.
+
+*And cost.* Greedy needs one pass per edge **per threshold**; ranking needs one
+pass per edge **once**, and every threshold after that is free. Sweeping ten
+thresholds on `dyck1` is 3,930 forward passes for greedy against 392 for
+ranking, so here ranking is ten times cheaper and slightly more accurate.
+
+*Recall against the ceiling is 1.000 for greedy on all eight programs.* The low
+raw F1 figures are not discovery failing; they are the prompts not exercising
+the whole program. `reverse` has a ceiling of 0.22, meaning four fifths of its
+planted edges have no causal signal on these inputs at all.
 
 ---
 
@@ -487,6 +582,57 @@ entry: what was expected, what was measured, and what was done about it.
 
 This section being empty at the end of phase 10 means the experiments were not
 sharp enough, not that everything worked.
+
+### Phase 5 — freeze-and-re-run does not measure an edge, and greedy pruning does not win
+
+Four findings, and the first is a correction to phase 3.
+
+**The obvious way to patch an edge is wrong.** Replace the sender's output,
+freeze what lies between it and the receiver, re-run: that is what phase 3
+implemented, and it measures a *bundle of paths*. The sender's patched output
+stays in the residual stream after the receiver, where every later component
+also reads it — and those cannot be frozen, because they have to stay live to
+respond to the receiver, which is the thing being measured.
+
+It is exactly right in one case: when nothing reads the sender after the
+receiver. Measured against the correct definition, the two agree to **2.8e-17**
+for every edge whose receiver is the final read-out, and disagree by **0.24 to
+0.56** of the clean-to-corrupt gap for edges into intermediate components. The
+phase-3 test that validated the code used `hist` — one head, one MLP, the
+logits — which is precisely the single case where the buggy procedure is
+correct. A test can pass for the wrong reason.
+
+The right definition is arithmetic: the residual stream is a sum, so a
+receiver's input is rewritten term by term and cutting an edge swaps one term
+in *that receiver's* input alone. It also composes, which the other does not:
+a *set* of edges is well defined under it, and discovery needs sets.
+
+**Phase 3's headline number was wrong, and the corrected one is smaller.** The
+edge-decomposition discrepancy was reported as 95% to 273% of the node effect.
+With the correct definition, and enumerating all 41 of the sender's edges
+rather than 4 of them, it is **4% when denoising and 32% when noising**. Still
+large enough to bound what an edge decomposition can mean, and not what was
+first published.
+
+**Freezing the LayerNorm scale is not a small approximation.** Attribution
+graphs need it, because it is the only way the residual-stream-to-port map
+becomes linear. Measured cost on a small random model: up to **0.35** of the
+clean-to-corrupt gap on a single edge. The default is therefore the exact
+treatment, with freezing available and measured.
+
+**Greedy edge pruning loses to independent ranking on 8 of 8 programs**, and
+the compiled regime cannot settle the question. See E4: compiled programs have
+no redundancy by construction, which is exactly the structure greedy pruning
+exists to handle, so the measurement establishes only that greedy is not
+better on non-redundant circuits. It also costs ten times more when sweeping a
+threshold.
+
+**And a measurement bug caught by a type, not a test.** An `Edge` whose port
+did not match its receiver — `attn -mlp_in-> attn` — was constructible, and
+the ablation engine looks edges up by `(layer, port, head)`, so such an edge
+would simply never be found. A typo would have quietly dropped an edge from a
+circuit rather than raising. `Edge` now validates the port against the
+receiver's kind at construction.
 
 ### Phase 3 — edge effects do not sum to node effects, and the compiled regime cannot show it
 

@@ -43,7 +43,11 @@ class GroundTruthGraph:
     """What the compiled model computes, and with which components."""
 
     nodes: tuple[Node, ...]
-    edges: tuple[tuple[Node, Node], ...]
+    #: ``(source, target, port)``.  The port is not an afterthought: a head
+    #: reading a variable as its *query* is a different edge from one reading
+    #: it as its *value*, and the compiler knows which, so guessing downstream
+    #: would throw away information that is available exactly here.
+    edges: tuple[tuple[Node, Node, str], ...]
     variables: tuple  # VariableSpace, one per allocated block
     unused: tuple[Node, ...]
     program_repr: str
@@ -51,9 +55,9 @@ class GroundTruthGraph:
 
     def __post_init__(self) -> None:
         known = set(self.nodes)
-        for src, dst in self.edges:
+        for src, dst, port in self.edges:
             if src not in known or dst not in known:
-                raise AssertionError(f"edge {src} -> {dst} names a node outside the graph")
+                raise AssertionError(f"edge {src} -{port}-> {dst} names a node outside the graph")
         overlap = known & set(self.unused)
         if overlap:
             raise AssertionError(f"nodes marked both used and unused: {sorted(overlap)}")
@@ -66,7 +70,7 @@ class GroundTruthGraph:
     def n_edges(self) -> int:
         return len(self.edges)
 
-    def edge_set(self) -> frozenset[tuple[Node, Node]]:
+    def edge_set(self) -> frozenset[tuple[Node, Node, str]]:
         return frozenset(self.edges)
 
     def describe(self) -> str:
@@ -79,6 +83,6 @@ class GroundTruthGraph:
             for node in self.unused:
                 lines.append(f"    {node.label}")
         lines.append("")
-        for src, dst in self.edges:
-            lines.append(f"  {src.label}  ->  {dst.label}")
+        for src, dst, port in self.edges:
+            lines.append(f"  {src.label}  -{port}->  {dst.label}")
         return "\n".join(lines)

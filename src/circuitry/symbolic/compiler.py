@@ -269,13 +269,34 @@ def _is_mlp(node: SOp) -> bool:
 
 def _dependencies(node: SOp) -> list[SOp]:
     """The variables a node reads, with selectors flattened into their operands."""
-    out: list[SOp] = []
-    for operand in node.operands:
-        if isinstance(operand, Selector):
-            out.extend(operand.operands)
-        else:
-            out.append(operand)
-    return out
+    return [dep for dep, _port in _dependency_ports(node)]
+
+
+def _dependency_ports(node: SOp) -> list[tuple[SOp, str]]:
+    """Each variable a node reads, and *which input* it is read through.
+
+    The compiler knows this exactly and nothing downstream can recover it: a
+    head reading a variable as its query is a different edge from one reading
+    the same variable as its value, and that distinction is most of what a
+    circuit is.  ``Select(keys, queries, pred)`` supplies the key and query
+    projections; ``Aggregate``'s own operand is what the head moves, so it is
+    the value.
+    """
+    if isinstance(node, Aggregate):
+        selector = node.selector
+        return [
+            (selector.keys, "k"),
+            (selector.queries, "q"),
+            (node.inner, "v"),
+        ]
+    if isinstance(node, SelectorWidth):
+        selector = node.selector
+        return [(selector.keys, "k"), (selector.queries, "q")]
+    if isinstance(node, Map):
+        return [(node.inner, "mlp_in")]
+    if isinstance(node, SequenceMap):
+        return [(node.lhs, "mlp_in"), (node.rhs, "mlp_in")]
+    return []
 
 
 def _schedule(order: list[SOp]) -> dict[int, tuple[int, int]]:
@@ -761,21 +782,29 @@ def _build_graph(layout, computed, placed, head_slots, heads_per_layer, n_layers
         implements.append((gt, layout.of(node).name))
         by_variable[id(node)] = gt
 
-    edges: list[tuple[Node, Node]] = []
+    edges: list[tuple[Node, Node, str]] = []
     for node in computed:
         dst = by_variable[id(node)]
-        for dep in _dependencies(node):
+        for dep, port in _dependency_ports(node):
             src = by_variable.get(id(dep), input_node)
-            if src != dst and (src, dst) not in edges:
-                edges.append((src, dst))
-        # A SelectorWidth's own MLP reads its own head's output.
+            if src != dst and (src, dst, port) not in edges:
+                edges.append((src, dst, port))
+        # A SelectorWidth's own MLP decodes its own head's output.
         if isinstance(node, SelectorWidth):
             layer, _ = placed[id(node)]
             mlp_node = Node(f"blocks.{layer}.mlp.out")
             if mlp_node not in nodes:
                 nodes.append(mlp_node)
-            if (dst, mlp_node) not in edges:
-                edges.append((dst, mlp_node))
+            if (dst, mlp_node, "mlp_in") not in edges:
+                edges.append((dst, mlp_node, "mlp_in"))
+
+    # The program's answer is read out through the unembedding, which is a real
+    # edge that discovery will and should find.
+    sink = Node("logits")
+    nodes.append(sink)
+    implements.append((sink, f"the read-out of {root.label}"))
+    root_component = by_variable.get(id(root), input_node)
+    edges.append((root_component, sink, "resid"))
 
     used_heads = {
         (layer, head_slots[id(n)]) for layer in range(n_layers) for n in heads_per_layer[layer]

@@ -64,6 +64,27 @@ def test_unknown_port_rejected():
         Edge(Component.embed(), Component.mlp(0), "value")
 
 
+def test_a_port_that_does_not_match_its_receiver_is_rejected():
+    """Not a nicety: the ablation engine looks edges up by (layer, port, head).
+
+    An edge whose port does not match its target would never be found there,
+    so a typo would quietly drop an edge from a circuit instead of raising.
+    """
+    with pytest.raises(ValueError, match="ports are"):
+        Edge(Component.embed(), Component.attn(1, 0), "mlp_in")
+    with pytest.raises(ValueError, match="ports are"):
+        Edge(Component.embed(), Component.mlp(1), "q")
+    with pytest.raises(ValueError, match="ports are"):
+        Edge(Component.embed(), Component.logits(4), "v")
+
+
+def test_the_embedding_takes_no_edges_and_the_sink_gives_none():
+    with pytest.raises(ValueError, match="no inputs"):
+        Edge(Component.mlp(0), Component.embed(), "resid")
+    with pytest.raises(ValueError, match="no output"):
+        Edge(Component.logits(4), Component.mlp(0), "mlp_in")
+
+
 def test_component_of_node_round_trips():
     assert component_of_node(Node("embed")) == Component.embed()
     assert component_of_node(Node("blocks.2.attn.z", (("head", 3),))) == Component.attn(2, 3)

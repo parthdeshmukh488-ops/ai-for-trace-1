@@ -1,4 +1,4 @@
-"""Path patching: the effect of one *edge*, not of one component.
+"""The effect of one *edge*, not of one component.
 
 A node effect answers "does this head matter", which is usually not the
 question.  The question is "does this head matter *to that one*", and through
@@ -6,28 +6,38 @@ which of its inputs -- because "head 9.9 reads head 7.3's output through its
 query and not through its value" is the kind of statement published circuits
 are made of, and a node measurement cannot express it.
 
-The procedure, and the part implementations get wrong
------------------------------------------------------
+Two procedures, and the difference between them is a correction
+-----------------------------------------------------------------
 
-To measure the edge from sender ``u`` to receiver ``v``, the change must reach
-``v`` **only** along that edge.  Three things have to be arranged:
+The obvious procedure is **freeze and re-run**: replace the sender's output
+with its counterfactual, freeze the components between sender and receiver so
+the change cannot reach the receiver by any other route, freeze the receiver's
+other ports so its attention pattern cannot move, and let everything
+downstream recompute.  That is :func:`path_patch_by_freezing`, and it is
+*wrong in general*.
 
-1. ``u``'s output is replaced by its counterfactual value.
-2. Every component that sits between ``u`` and ``v`` is **frozen** at its
-   base-run value.  Those components read ``u``, so without freezing them the
-   change would also arrive at ``v`` along ``u -> w -> v``, and the
-   measurement would be of a set of paths rather than of an edge.
-3. If ``v`` is an attention head and the edge is into its *value* input, then
-   ``v``'s own query and key are frozen too.  Otherwise the sender's change
-   moves ``v``'s attention pattern, and what gets measured is the edge into
-   ``q`` and ``k`` as well as the one into ``v``.
+The reason is that the sender's patched output stays in the residual stream
+after the receiver, where every later component also reads it.  Freezing those
+later components is not an option -- they have to stay live to respond to the
+receiver's change, which is the thing being measured.  So the procedure
+measures the sender's effect through the receiver *and* through every later
+reader at once: a bundle of paths, not an edge.
 
-Everything downstream of ``v`` recomputes freely: that is what makes this the
-effect of the edge *on the output*, rather than the effect on ``v``'s
-activation.
+It is exactly right in one case: when nothing reads the sender after the
+receiver.  Measured on a small random model, the two procedures agree to
+machine precision (2.8e-17) for every edge whose receiver is the final
+read-out, and disagree by 0.24 to 0.56 of the clean-to-corrupt gap for edges
+into intermediate components.  The phase-3 test that originally validated this
+code used ``hist``, whose one head reaches the output through one MLP whose
+only reader is the logits -- the single case in which the buggy procedure is
+correct.
 
-Point 3 is the one worth labouring.  It is why :func:`path_patch` takes a
-``port`` and why there is no default for it.
+The right definition is arithmetic, and it is the one :func:`path_patch` now
+uses.  The residual stream is a sum, so a receiver's input can be rewritten
+term by term, and cutting an edge means swapping one term in *that receiver's*
+input and leaving every other reader's view of the sender alone.  See
+:mod:`circuitry.attrib.ablate`, which implements it, composes over sets of
+edges, and recomputes each receiver's LayerNorm from its reconstructed input.
 
 What edge effects do not do
 ---------------------------
@@ -35,8 +45,7 @@ What edge effects do not do
 They do not sum to the node effect.  The composition is nonlinear -- softmax
 and the MLP activation -- so decomposing a node's influence into its outgoing
 edges leaves a remainder, and the *size* of that remainder bounds what any
-edge decomposition can mean.  :func:`path_decomposition_error` measures it, and
-phase 3 records the number rather than assuming it is small.
+edge decomposition can mean.  :func:`path_decomposition_error` measures it.
 """
 
 from __future__ import annotations
@@ -57,7 +66,12 @@ from .metric import (
 )
 from .patching import Counterfactual, _all_indices, _multi_index_hook
 
-__all__ = ["PathResult", "path_decomposition_error", "path_patch"]
+__all__ = [
+    "PathResult",
+    "path_decomposition_error",
+    "path_patch",
+    "path_patch_by_freezing",
+]
 
 _PORT_SITES = {"q": "attn.q", "k": "attn.k", "v": "attn.v"}
 
@@ -154,7 +168,7 @@ def _frozen_plan(cfg, sender: Component, receiver: Component, port: str):
     return plan
 
 
-def path_patch(
+def path_patch_by_freezing(
     model,
     *,
     pair: PromptPair,
@@ -165,7 +179,15 @@ def path_patch(
     counterfactual: Counterfactual | None = None,
     baselines: Baselines | None = None,
 ) -> PathResult:
-    """The effect on the metric of the single edge ``sender -> receiver.port``."""
+    """Freeze-and-re-run edge patching.  Correct only in a special case.
+
+    Kept because it is an independently written implementation of the same
+    quantity *where the two agree*, which makes it the cross-check for
+    :func:`path_patch`.  It is correct when nothing reads the sender after the
+    receiver -- in practice, when the receiver is the final read-out -- and
+    wrong otherwise, for the reason in the module docstring.  Prefer
+    :func:`path_patch`.
+    """
     if direction not in ("denoise", "noise"):
         raise ValueError(f"direction must be 'denoise' or 'noise', got {direction!r}")
     if direction == "denoise" and counterfactual is not None:
@@ -299,3 +321,49 @@ def path_decomposition_error(
         "relative_discrepancy": gap / node_effect if node_effect else float("nan"),
         "n_edges": len(edges),
     }
+
+
+def path_patch(
+    model,
+    *,
+    pair: PromptPair,
+    sender: Component,
+    receiver: Component,
+    port: str,
+    direction: Direction,
+    counterfactual: Counterfactual | None = None,
+    baselines: Baselines | None = None,
+    freeze_layernorm: bool = False,
+) -> PathResult:
+    """The effect on the metric of the single edge ``sender -> receiver.port``.
+
+    Implemented by reconstructing the receiver's input term by term, so that
+    cutting the edge changes only that receiver's view of the sender; see
+    :mod:`circuitry.attrib.ablate`.  This is the definition the rest of the
+    package uses, because it is the only one that composes: a *set* of edges
+    is well defined under it, which is what discovery needs.
+    """
+    from .ablate import AblationEngine
+    from .circuit import Edge
+
+    engine = AblationEngine(
+        model=model,
+        pair=pair,
+        direction=direction,
+        counterfactual=counterfactual,
+        baselines=baselines,
+        freeze_layernorm=freeze_layernorm,
+    )
+    edge = Edge(sender, receiver, port)
+    level = engine.level([edge])
+    return PathResult(
+        effect=effect_of(level, direction),
+        level=level,
+        sender=sender,
+        receiver=receiver,
+        port=port,
+        direction=direction,
+        counterfactual=counterfactual.name if counterfactual else "clean",
+        frozen_sites=(),
+        forward_passes=engine.forward_passes,
+    )

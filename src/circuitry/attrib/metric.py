@@ -50,6 +50,7 @@ __all__ = [
     "logit_diff",
     "logprob",
     "normalise",
+    "normalise_per_item",
 ]
 
 Direction = Literal["denoise", "noise"]
@@ -208,6 +209,19 @@ def measure_baselines(
         threshold = 0.1 * float(gap.median())
     keep = gap > threshold
     return Baselines(clean=clean, corrupt=corrupt, keep=keep, threshold=float(threshold))
+
+
+def normalise_per_item(values: torch.Tensor, baselines: Baselines) -> torch.Tensor:
+    """The normalised level for each usable item, before averaging.
+
+    Needed because the sampling error of a patching measurement is a property
+    of the *prompt sample*, and estimating it means resampling items.  Averaging
+    first throws that away.
+    """
+    keep = baselines.keep
+    num = values[keep] - baselines.corrupt[keep]
+    den = baselines.clean[keep] - baselines.corrupt[keep]
+    return num / den
 
 
 def normalise(values: torch.Tensor, baselines: Baselines) -> float:
