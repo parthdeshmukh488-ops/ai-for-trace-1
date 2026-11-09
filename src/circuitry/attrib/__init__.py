@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from .circuit import Circuit, Component, Edge, all_components, all_edges
+from .gradients import attribute
 from .metric import PromptPair, effect_of, kl_from, logit_diff, logprob, measure_baselines
 from .patching import (
     GaussianAblation,
@@ -25,6 +26,7 @@ __all__ = [
     "ZeroAblation",
     "all_components",
     "all_edges",
+    "attribute",
     "effect_of",
     "kl_from",
     "logit_diff",

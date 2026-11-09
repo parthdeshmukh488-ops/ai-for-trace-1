@@ -988,6 +988,73 @@ custom predicate — takes the slot as the second four-deep composed program.
 The suite is nine programs, as specified, and `docs/EXPERIMENTS.md` reports
 per program.
 
+### 2026-11-08 — phase 4 cannot run on compiled models
+
+**Was:** §E2's protocol named the compiled programs as its substrate, on the
+grounds that exact patching is available there as ground truth.
+
+**Why that was wrong, and it is a fact about the whole compiled approach:** a
+compiled model is exact *because* its lookup tables are piecewise constant —
+one neuron per domain element, firing or not — and the derivative of a
+piecewise-constant function is zero. The gradient inside a compiled model is
+therefore identically zero at a large fraction of its sites. Measured across
+the suite: between a third and two thirds, rising with program depth
+(`dyck1`, six layers, has a gradient at 6 of 18 sites). Every gradient-based
+estimate at those sites is exactly 0 while the true effect is large, so an
+"error" measured there is measuring the artefact and not curvature.
+
+**Now:** E2 runs on models with smooth nonlinearities — random transformers
+swept over depth, which is the available proxy for composition depth, plus a
+saturated-attention variant built by scaling the query and key projections.
+The dead-gradient fractions are reported as their own arm of the experiment so
+the exclusion is on the record rather than being a silent change of plan.
+
+Compiled models remain the right substrate for everything that does *not*
+involve a gradient: discovery in phase 5, where the scorer is exact patching
+and the question is which subgraph comes back, is exactly what they are for.
+
+### 2026-11-08 — integrated gradients interpolates one index, not one site
+
+**Was:** §3.5 gave the integrated-gradient formula without saying what is held
+fixed while the path is traversed.
+
+**Why it matters:** a patching effect is defined for one index, so the path
+must be the one where only that index moves. Interpolating the whole site
+while taking the dot product at one index integrates along a different path
+and does not converge to the effect — it converges, to the wrong number.
+Measured: a plateau at 0.30 worst error against effects of order 0.9, stable
+from 8 steps to 128. Per-index interpolation converges at the right-endpoint
+Riemann rate instead, the error halving with each doubling of the step count
+(measured ratios 2.29, 2.08, 2.04, 2.02, 2.01, 2.01, 2.00).
+
+Only the *rate* distinguishes the two, which is why the test checks the rate
+rather than that more steps help.
+
+**And the consequence for cost:** per-index interpolation means integrated
+gradients costs `n_steps` evaluations per index, where exact patching costs
+one. It is therefore **strictly dominated** — more expensive at every step
+count and never exact. The only gradient method that buys anything is the
+plain first-order one, whose cost does not grow with the number of indices at
+all. The compute axis in E2 exists to make that visible, and it is counted in
+*batch items processed* rather than forward passes, because a method that
+batches its own interpolation steps would otherwise look free.
+
+### 2026-11-08 — the error is a fraction of the largest effect, not an elementwise ratio
+
+**Was:** §E2 asked for "median relative error".
+
+**Why that does not work:** most indices have effects near zero. Dividing by
+them produces enormous ratios that say nothing, and any summary over them is
+dominated by the smallest effect in the model. This is the same mistake the
+forward-pass cross-check made in §1.7, arrived at independently in a second
+place.
+
+**Now:** absolute error, and absolute error as a fraction of the largest true
+effect in that substrate, which is comparable across substrates without being
+hostage to the smallest. Sign errors are counted only over indices whose true
+effect exceeds 5% of the largest, because the sign of a near-zero effect is
+not a claim anybody makes.
+
 ### 2026-11-08 — the level is not the effect
 
 **Was:** §3.1 defined the normalised metric as `(patched - corrupt) /

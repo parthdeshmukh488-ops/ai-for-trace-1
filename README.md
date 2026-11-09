@@ -50,22 +50,84 @@ activation, and the places where it breaks are precisely the interesting ones:
 saturated softmaxes, LayerNorm's normalisation, and any node whose effect is
 large — which is to say, the nodes that end up in the circuit.
 
-In regime 1 both sides of that equation are computable, so the error is not a
-matter of opinion. The headline measurement reports, over the full set of
-nodes and edges of compiled programs:
+Exact patching is not an estimate of that equation's left-hand side — it *is*
+the left-hand side, re-measured. So the error is computable and not a matter
+of opinion. The headline measurement, over seven families of site at every
+position of transformers swept across depth:
 
-| quantity | attribution patching | integrated gradients (n=16) | exact patching |
-|---|---|---|---|
-| median relative error vs exact | `[[M1a]]` | `[[M1b]]` | 0 by definition |
-| 95th percentile relative error | `[[M1c]]` | `[[M1d]]` | 0 |
-| fraction of edges with the **wrong sign** | `[[M1e]]` | `[[M1f]]` | 0 |
-| forward passes per circuit | `[[M1g]]` | `[[M1h]]` | `[[M1i]]` |
+| | first order | + softmax fix | + gradient dropout | integrated, n=16 | exact |
+|---|---|---|---|---|---|
+| median error | **0.0098** | **0.0056** | 0.0105 | 0.0006 | 0 by definition |
+| worst error | **0.94** | 0.93 | 1.01 | 0.044 | 0 |
+| **wrong sign** | **14.9%** | 13.3% | 13.7% | 0% | 0% |
+| compute | 32 | 32 | 64 | 26,656 | 256 |
 
-A sign error is the one that matters: it does not shrink a circuit, it puts
-the wrong edge in it. The experiment reports where in the model sign errors
-concentrate and what effect size they survive to — the honest version of
-"attribution patching correlates well with patching", which is true on average
-and false exactly where it is used.
+Errors are fractions of the largest true effect in that substrate, averaged
+over six models spanning depth 2 to 6. An elementwise relative error would be
+meaningless: most effects are near zero, and dividing by them gives a summary
+dominated by the smallest number in the model. Sign errors are counted only
+over effects above 5% of the largest, because the sign of a near-zero effect
+is not a claim anybody makes. Compute is batch items processed, not forward
+passes — integrated gradients batches its own interpolation steps, and a pass
+count would make it look free.
+
+Four things the measurement says that the usual summary statistics do not.
+
+**The median is reassuring and the tail is not.** A median error of 1% of the
+largest effect sits alongside a worst case of 94% of it, and a Spearman
+correlation of 0.69 — the number usually quoted — alongside **14.9% of
+decision-relevant effects coming out with the wrong sign.** A sign error does
+not shrink a circuit; it puts the wrong component in it.
+
+**The error is concentrated exactly where it does damage.** Broken down by the
+size of the true effect, the median error rises monotonically from 0.0002 in
+the smallest decile to 0.1426 in the largest — a factor of **700**. The
+estimate is accurate about the components that do not matter and inaccurate
+about the ones that do, which is the precise sense in which "attribution
+patching correlates well with patching" is true on average and false where it
+is used.
+
+**It depends on how much you patch at once.** A first-order expansion is a
+claim about small displacements. Patching one head at one position gives a
+median error of 0.038 and 17.7% wrong signs; pooling that head's whole
+contribution across every position gives **0.368 and 27.4%**. Nothing changed
+but the size of the displacement.
+
+**Integrated gradients is dominated by being exact.** Both need one evaluation
+per index; integrated gradients needs *n* of them. At 16 steps it reaches a
+median error of 0.0006 for 26,656 batch items, against exact patching's zero
+error for **256** — 104 times the compute, and still not exact. Only the plain
+first-order method buys anything, because its cost does not grow with the
+number of indices at all.
+
+### The two fixes, measured separately
+
+**Softmax recomputation works, and costs nothing.** It cuts the median error
+by 43% and the sign-error rate from 14.9% to 13.3%, with no extra forward or
+backward pass, by recomputing the attention pattern exactly instead of
+expanding through it. On the saturated-attention substrate, where the fix is
+supposed to matter most, it is dramatic: the worst error on `attn.scores`
+falls from **27.1 to 0.89**, a factor of thirty. A first-order estimate of a
+saturated softmax can be wrong by twenty-seven times the largest real effect
+in the model.
+
+**Gradient dropout does not.** Taking the largest magnitude over per-layer
+gradient cuts makes the median error *worse* (0.0105 against 0.0098) and the
+worst case worse (1.01 against 0.94), buying a 1.2-point improvement in sign
+errors for twice the compute. Combined with the softmax fix it gives the best
+sign-error rate in the table, 11.4%, and still the worst maximum error. On
+these models it is not worth its cost — reported here because it was expected
+to help.
+
+And one finding about the laboratory itself, which changed where this
+experiment can run at all. A compiled model is exact *because* its lookup
+tables are piecewise constant — and the derivative of a piecewise-constant
+function is zero. The gradient inside a compiled model is identically zero at
+**up to 67%** of its sites (`dyck1`, `hist` and `unique`; 0% only for the
+shallowest program in the suite). Gradient methods cannot be measured there at
+all: the "error" would be that artefact rather than curvature. So this
+experiment runs on models with smooth nonlinearities, and regime 1 is reserved
+for the questions that do not involve a gradient — which is what discovery is.
 
 *Measured by* [`experiments/attribution_error.py`](experiments/attribution_error.py).
 

@@ -103,23 +103,46 @@ paths partly cancel; (c) `two_hop` is worse than the single-aggregate programs;
 elsewhere; (e) integrated gradients' error falls roughly as `1/n` until it
 hits the exact-patching floor.
 
-**Oracle.** Exact patching on compiled models, where the effect is a
-re-measured forward pass and not an estimate at all.
+**Oracle.** Exact patching, which is the definition of the effect rather than
+an estimate of it, and is therefore an oracle on any substrate.
+
+**Substrate — changed from the specification, for a reason that matters.** The
+protocol originally named the compiled programs, on the grounds that the
+ground-truth circuit is known there. That is the wrong substrate, and the
+reason is a fact about the whole compiled approach: a compiled model is exact
+*because* its lookup tables are piecewise constant, and the derivative of a
+piecewise-constant function is zero. The gradient inside a compiled model is
+identically zero at between a third and two thirds of its sites, rising with
+depth. Every gradient estimate there is exactly 0 against a large true effect,
+so the measured "error" would be that artefact and not curvature.
+
+So this experiment runs on models with smooth nonlinearities, and the
+dead-gradient fractions are reported as their own arm so the exclusion is on
+the record. Compiled models remain the right substrate for discovery, where no
+gradient is involved.
 
 **Protocol.**
 
-* Programs: all nine, reported separately; `two_hop` and `most_freq` are the
-  compositional cases and get their own panel.
-* For each program: 256 clean/corrupt input pairs, non-degenerate by §3.1.
-* Nodes: every head and MLP at every position. Edges: every port-level edge in
-  the model's graph. For the compiled models this is small enough to enumerate
-  exhaustively, which is the other advantage of this regime.
-* Estimators: exact patching (ground truth), attribution patching, attribution
-  patching + softmax recomputation, + gradient dropout, + both, and integrated
-  gradients at `n in {2, 4, 8, 16, 32, 64}`.
-* Metric: normalised logit difference, both directions (denoise and noise),
-  reported separately — a method may be fine in one direction and not the
-  other, and pooling them would hide it.
+* Substrates: random transformers at depth 2, 4 and 8, three seeds each, with
+  depth as the available proxy for composition depth; plus a
+  saturated-attention variant, built by scaling the query and key projections,
+  which is the regime the softmax fix exists for. Reported per substrate, never
+  pooled into one number.
+* 8 clean/corrupt pairs per substrate, non-degenerate by §3.1.
+* Sites: seven families — `attn.z`, `attn.q`, `attn.k`, `attn.scores`,
+  `attn.pattern`, `mlp.out`, `resid_post` — at every position, reported by
+  family so the answer says which *kind* of site a method fails on.
+* Estimators: exact patching (ground truth), first-order attribution, first
+  order + softmax recomputation, + gradient dropout, + both, and integrated
+  gradients at `n in {2, 4, 8, 16, 32}`.
+* Metric: normalised logit difference, both directions, reported separately.
+* Error as absolute error and as a fraction of the largest true effect in that
+  substrate. Elementwise relative error is *not* reported: most effects are
+  near zero and dividing by them gives ratios that say nothing. Sign errors are
+  counted only over effects above 5% of the largest.
+* Compute in **batch items processed**, not forward passes: integrated
+  gradients batches its own interpolation steps, so a pass count would make it
+  look free.
 
 **Outputs.** `results/attribution_error.{json,png}`. JSON:
 `per_program[program][estimator] -> {median_rel_err, p95_rel_err,
@@ -141,7 +164,86 @@ bug rather than curvature.
 **Compute.** CPU, tens of minutes. The exhaustive edge enumeration is the cost
 driver; `--quick` reduces to three programs and 32 pairs.
 
-**Result.** *(fill in: the table in the README, plus which of (a)-(e) survived)*
+**Result.** Averaged over six smooth substrates (depth 2, 4 and 6; two seeds
+each), denoising, errors as fractions of the largest true effect:
+
+| | first order | + softmax | + dropout | + both | IG n=4 | IG n=16 | exact |
+|---|---|---|---|---|---|---|---|
+| median error | 0.0098 | 0.0056 | 0.0105 | 0.0089 | 0.0023 | 0.0006 | 0 |
+| worst error | 0.94 | 0.93 | 1.01 | 1.01 | 0.18 | 0.044 | 0 |
+| wrong sign | 14.9% | 13.3% | 13.7% | 11.4% | 0.5% | 0% | 0% |
+| Spearman | 0.693 | 0.735 | 0.702 | 0.740 | 0.969 | 0.992 | 1 |
+| batch items | 32 | 32 | 64 | 64 | 6,688 | 26,656 | 256 |
+
+Error by decile of the true effect's size (first order, deepest substrate):
+
+| decile | 1 | 3 | 5 | 7 | 9 (largest) |
+|---|---|---|---|---|---|
+| mean \|true\| | 0.0005 | 0.0055 | 0.0160 | 0.0715 | 0.3826 |
+| median error | 0.0002 | 0.0028 | 0.0088 | 0.0273 | **0.1426** |
+
+Wall time 69 seconds on four CPU cores.
+
+**The hypotheses.**
+
+*(a) Errors concentrate on large-effect nodes, so the summary correlation
+overstates usefulness.* **Survived, decisively.** The median error rises
+monotonically across every decile, from 0.0002 to 0.1426 — a factor of 700.
+The Spearman correlation of 0.693 is the number usually quoted and it coexists
+with 14.9% of decision-relevant effects having the wrong sign. The same point
+again from a different angle: pooling a head's contribution over all positions
+instead of patching one position at a time takes the median error from 0.038
+to 0.368 and the sign-error rate from 17.7% to 27.4%, with nothing changed but
+the size of the displacement.
+
+*(b) Sign errors appear where two paths partly cancel.* **Not tested as
+stated**, and weak evidence against. The measurement here is over nodes, not
+edges, so the claim as written was not put at risk. What was tested is the
+probe designed to detect that cancellation — gradient dropout — and it made
+the estimate worse rather than better, which is not what one would expect if
+cancellation were the dominant mechanism.
+
+*(c) `two_hop` is worse than the single-aggregate programs.* **Void.**
+Compiled models turned out to be an impossible substrate for this experiment
+(see the substrate note above), so there are no per-program numbers. Depth is
+the substitute axis, and the error does grow with it.
+
+*(d) Softmax recomputation helps on `q`/`k`/`scores` and nothing elsewhere.*
+**Survived, both halves, and the first half is dramatic.** Overall it cuts the
+median error by 43% and the sign-error rate from 14.9% to 13.3% at no cost at
+all. On the saturated-attention substrate, where the fix is meant to matter,
+the worst error on `attn.scores` falls from **27.1 to 0.89** — a factor of
+thirty. A first-order estimate of a saturated softmax can be wrong by
+twenty-seven times the largest real effect in the model, and recomputing one
+softmax fixes it. The second half holds too: on `attn.z` and `mlp.out` the fix
+changes the estimate by less than 1e-12, which is a test rather than a
+measurement.
+
+*(e) Integrated gradients' error falls as 1/n until it hits a floor.* **The
+rate survived; the premise did not.** The error falls as exactly 1/n — measured
+ratios of 2.29, 2.08, 2.04, 2.02, 2.01, 2.01, 2.00 for each doubling — and
+there is no floor, because it converges to the exact effect. The surprise is on
+the other axis: both methods need one evaluation per index and integrated
+gradients needs *n* of them, so it is **strictly dominated by exact patching**
+— 104 times the compute at n=16, and still not exact. Only the plain
+first-order method buys anything, since its cost does not grow with the number
+of indices at all. This was not anticipated by the hypothesis and is arguably
+the most decision-relevant line in the table.
+
+**An unanticipated finding: gradient dropout does not help.** Taking the
+largest magnitude over per-layer gradient cuts makes the median error worse
+(0.0105 against 0.0098) and the worst case worse (1.01 against 0.94), in
+exchange for 1.2 points of sign-error rate and twice the compute. Combined
+with the softmax fix it gives the best sign-error rate in the table (11.4%)
+and still the worst maximum error. It is reported because it was expected to
+help; on these models it is not worth its cost.
+
+A bug worth recording, because it would have produced a false negative rather
+than a wrong number: the first implementation skipped the gradient cut whenever
+the site being cut was also a site being measured, which on a full sweep is
+every site — so the method silently did nothing while appearing to run. It was
+found by reading the code rather than by any test, and the fix changed the
+measured outcome from "no effect" to "a small harm".
 
 ---
 
